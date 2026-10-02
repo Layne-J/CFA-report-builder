@@ -1,0 +1,2133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chick-fil-A Initiative Guide Builder | Custom Training & Operations</title>
+  <style>
+    :root {
+      --cfa-red: #DD0031;
+      --cfa-red-dark: #AF272F;
+      --cfa-red-light: #FFF1F2;
+      --cfa-red-border: #FECDD3;
+      --cfa-navy: #004F71;
+      --cfa-charcoal: #5B6770;
+      --cfa-muted: #6B7280;
+      --cfa-bg: #F3F4F6;
+      --cfa-card-bg: #FFFFFF;
+      --cfa-border: #E5E7EB;
+      --cfa-gold: #D97706;
+      --cfa-gold-light: #FEF3C7;
+      --cfa-green: #16A34A;
+      --cfa-green-light: #F0FDF4;
+      --cfa-green-border: #BBF7D0;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--cfa-bg);
+      color: var(--cfa-navy);
+      line-height: 1.4;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Navigation Bar */
+    .app-topbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: #FFFFFF;
+      border-bottom: 2px solid var(--cfa-red);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .topbar-brand { display: flex; align-items: center; gap: 10px; }
+    .brand-badge {
+      background: var(--cfa-red);
+      color: #FFFFFF;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 9999px;
+    }
+    .brand-title { font-size: 1.05rem; font-weight: 800; color: var(--cfa-navy); }
+    .brand-subtitle { font-size: 0.76rem; color: var(--cfa-muted); margin-left: 4px; }
+    .topbar-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    .preset-select {
+      padding: 7px 12px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--cfa-navy);
+      background: #F9FAFB;
+      border: 1px solid #D1D5DB;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+
+    .btn {
+      padding: 7px 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn-secondary { background: #FFFFFF; color: var(--cfa-charcoal); border-color: #D1D5DB; }
+    .btn-secondary:hover { background: #F3F4F6; color: var(--cfa-navy); }
+    .btn-primary { background: var(--cfa-red); color: #FFFFFF; }
+    .btn-primary:hover { background: var(--cfa-red-dark); }
+    .btn-toggle-editor { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
+    .btn-toggle-editor:hover { background: #DBEAFE; }
+
+    /* App Workspace */
+    .app-workspace { display: flex; height: calc(100vh - 58px); overflow: hidden; }
+
+    .form-sidebar {
+      width: 480px;
+      flex-shrink: 0;
+      background: #FFFFFF;
+      border-right: 1px solid var(--cfa-border);
+      overflow-y: auto;
+      padding: 16px 20px 40px 20px;
+      transition: margin-left 0.25s ease;
+    }
+    .form-sidebar.collapsed { margin-left: -480px; }
+
+    .form-section-title {
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--cfa-red);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Accordion */
+    .accordion-card {
+      background: #FAFAFA;
+      border: 1px solid var(--cfa-border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 14px;
+      overflow: hidden;
+    }
+    .accordion-header {
+      background: #F3F4F6;
+      padding: 10px 14px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: var(--cfa-navy);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+    }
+    .accordion-header:hover { background: #E5E7EB; }
+    .accordion-header::after { content: "▼"; font-size: 0.65rem; color: var(--cfa-muted); transition: transform 0.2s; }
+    .accordion-card.closed .accordion-header::after { transform: rotate(-90deg); }
+    .accordion-card.closed .accordion-body { display: none; }
+    .accordion-body { padding: 14px; background: #FFFFFF; }
+
+    /* Form Fields */
+    .form-group { margin-bottom: 12px; }
+    .form-group label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--cfa-charcoal);
+      margin-bottom: 4px;
+    }
+    .form-control {
+      width: 100%;
+      padding: 7px 10px;
+      font-size: 0.82rem;
+      color: var(--cfa-navy);
+      background: #FFFFFF;
+      border: 1px solid #D1D5DB;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--cfa-red);
+      box-shadow: 0 0 0 2px var(--cfa-red-light);
+    }
+    textarea.form-control { resize: vertical; min-height: 54px; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .image-picker-row { display: flex; align-items: center; gap: 10px; }
+    .file-input-btn {
+      font-size: 0.74rem;
+      padding: 6px 10px;
+      background: #F3F4F6;
+      border: 1px solid #D1D5DB;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* Preview Canvas */
+    .preview-canvas {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 24px;
+      background: #4B5563;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .preview-canvas-header {
+      width: 210mm;
+      max-width: 100%;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      color: #F3F4F6;
+      font-size: 0.78rem;
+    }
+
+    /* A4 Document Containers */
+    .a4-page {
+      width: 210mm;
+      min-height: 297mm;
+      background: #FFFFFF;
+      margin-bottom: 24px;
+      padding: 12mm 14mm;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-sizing: border-box;
+    }
+    .page-content { flex-grow: 1; }
+
+    .header-hero-wrap {
+      width: 100%;
+      height: 220px;
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      overflow: hidden;
+      position: relative;
+      background: #E5E7EB;
+    }
+    .header-hero-img { width: 100%; height: 100%; object-fit: cover; object-position: center 38%; display: block; }
+    .header-hero-wrap::after {
+      content: "";
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 60px;
+      background: linear-gradient(to bottom, rgba(221, 0, 49, 0) 0%, rgba(201, 17, 38, 0.75) 70%, var(--cfa-red) 100%);
+      pointer-events: none;
+    }
+
+    .guide-header {
+      background: linear-gradient(180deg, var(--cfa-red) 0%, var(--cfa-red-dark) 100%);
+      color: #FFFFFF;
+      border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+      padding: 16px 20px 18px 20px;
+      margin-bottom: 12px;
+    }
+    .header-eyebrow {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: rgba(255, 255, 255, 0.22);
+      padding: 3px 9px;
+      border-radius: 9999px;
+      margin-bottom: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .header-title-row h1 { font-size: 1.65rem; font-weight: 800; letter-spacing: -0.01em; line-height: 1.15; }
+    .header-title-row p.subtitle { font-size: 0.85rem; opacity: 0.95; margin-top: 4px; line-height: 1.3; }
+
+    .metadata-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.25);
+    }
+    .meta-item {
+      background: rgba(255, 255, 255, 0.12);
+      padding: 6px 8px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .meta-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; opacity: 0.85; }
+    .meta-value { font-size: 0.76rem; font-weight: 700; margin-top: 2px; line-height: 1.25; }
+
+    .huddle-banner {
+      background: #2a3348;
+      color: #FFFFFF;
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      margin-bottom: 12px;
+    }
+    .huddle-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding-bottom: 5px;
+      margin-bottom: 8px;
+    }
+    .huddle-tag {
+      background: #c64242;
+      color: #FFFFFF;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+    .huddle-title { font-size: 0.92rem; font-weight: 800; color: #FFFFFF; }
+    .huddle-meta { font-size: 0.72rem; color: #dbe2ee; }
+    .huddle-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .huddle-cell h5 { font-size: 0.64rem; text-transform: uppercase; color: #F87171; margin-bottom: 2px; }
+    .huddle-cell p { font-size: 0.76rem; color: #F3F4F6; line-height: 1.3; }
+
+    .section-card {
+      background: #FFFFFF;
+      border-radius: var(--radius-sm);
+      border: 1px solid #D1D5DB;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--cfa-red-light);
+    }
+    .section-header h2 { font-size: 0.95rem; font-weight: 800; color: var(--cfa-red); text-transform: uppercase; }
+    .section-icon-wrap {
+      width: 26px; height: 26px;
+      background: var(--cfa-red-light);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .cfa-icon { width: 16px; height: 16px; }
+
+    .three-pillar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .pillar-box {
+      background: #FAFAFA;
+      border: 1px solid #D1D5DB;
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      border-top: 3px solid var(--cfa-red);
+    }
+    .pillar-box h3 { font-size: 0.76rem; font-weight: 800; color: var(--cfa-red); text-transform: uppercase; margin-bottom: 2px; }
+    .pillar-subtitle { font-size: 0.68rem; font-style: italic; color: var(--cfa-muted); margin-bottom: 4px; }
+    .pillar-box p, .pillar-box ul { font-size: 0.74rem; color: var(--cfa-charcoal); line-height: 1.3; }
+    .pillar-box ul { list-style-type: none; }
+    .pillar-box ul li { position: relative; padding-left: 12px; margin-bottom: 3px; }
+    .pillar-box ul li::before { content: "•"; position: absolute; left: 2px; color: var(--cfa-red); font-weight: bold; }
+
+    .script-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .script-card {
+      border: 1px solid #D1D5DB;
+      border-radius: var(--radius-sm);
+      background: #FFFFFF;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .script-badge-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .script-category {
+      font-size: 0.62rem;
+      font-weight: 800;
+      color: var(--cfa-red);
+      background: var(--cfa-red-light);
+      border: 1px solid var(--cfa-red-border);
+      padding: 2px 7px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+    }
+    .trigger-text { font-size: 0.7rem; color: var(--cfa-muted); line-height: 1.25; margin-bottom: 4px; }
+    .trigger-text strong { color: var(--cfa-navy); }
+
+    .say-bubble {
+      background: #FFF1F2;
+      border: 1px solid #FECDD3;
+      border-left: 4px solid var(--cfa-red);
+      border-radius: 4px;
+      padding: 6px 10px;
+      margin: 5px 0;
+      font-size: 0.78rem;
+      color: #990022;
+      font-weight: 600;
+      font-style: italic;
+      line-height: 1.3;
+    }
+
+    .coaching-tip {
+      font-size: 0.68rem;
+      color: var(--cfa-muted);
+      display: block;
+      line-height: 1.35;
+      padding-left: 28px;
+      position: relative;
+    }
+    .coaching-tip strong { color: var(--cfa-navy); position: absolute; left: 0; top: 0; }
+    .coaching-tip em, .coaching-tip i { display: block; font-style: italic; color: var(--cfa-red); margin: 2px 0 2px 10px; }
+
+    .cta-box {
+      background: #FFF7ED;
+      border: 1px solid #FED7AA;
+      border-left: 4px solid var(--cfa-gold);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      margin-top: 8px;
+    }
+    .cta-box h4 { font-size: 0.72rem; font-weight: 800; color: var(--cfa-gold); text-transform: uppercase; margin-bottom: 4px; }
+    .cta-dialogues { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .cta-dialogue-item { font-size: 0.72rem; color: var(--cfa-charcoal); line-height: 1.3; }
+    .cta-dialogue-item strong { display: block; font-size: 0.62rem; text-transform: uppercase; color: var(--cfa-navy); margin-bottom: 2px; }
+
+    .rules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .rule-card {
+      background: #FFFFFF;
+      border: 1px solid #D1D5DB;
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .rule-number {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--cfa-red); color: #FFFFFF;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.78rem; flex-shrink: 0;
+    }
+    .rule-content h4 { font-size: 0.78rem; font-weight: 700; color: var(--cfa-navy); margin-bottom: 2px; }
+    .rule-content p { font-size: 0.72rem; color: var(--cfa-charcoal); line-height: 1.3; }
+
+    table.cadence-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; border: 1px solid #D1D5DB; }
+    table.cadence-table th {
+      background: #F3F4F6; color: var(--cfa-navy); font-weight: 700;
+      padding: 5px 8px; border: 1px solid #D1D5DB; text-transform: uppercase; font-size: 0.62rem;
+    }
+    table.cadence-table td { padding: 5px 8px; border: 1px solid #E5E7EB; vertical-align: top; color: var(--cfa-charcoal); line-height: 1.25; }
+    .week-badge { font-weight: 800; color: var(--cfa-red); }
+
+    .dodont-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .dodont-card { border-radius: var(--radius-sm); padding: 8px 10px; }
+    .dodont-card.do { background: var(--cfa-green-light); border: 1px solid #86EFAC; border-top: 3px solid var(--cfa-green); }
+    .dodont-card.dont { background: #FEF2F2; border: 1px solid #FECDD3; border-top: 3px solid #DC2626; }
+    .dodont-header { font-size: 0.74rem; font-weight: 800; margin-bottom: 5px; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+    .dodont-card.do .dodont-header { color: var(--cfa-green); }
+    .dodont-card.dont .dodont-header { color: var(--cfa-red); }
+    .dodont-list { list-style-type: none; }
+    .dodont-list li { font-size: 0.7rem; margin-bottom: 4px; line-height: 1.3; color: var(--cfa-navy); padding-left: 14px; position: relative; }
+    .dodont-card.do .dodont-list li::before { content: "✓"; position: absolute; left: 0; color: var(--cfa-green); font-weight: bold; }
+    .dodont-card.dont .dodont-list li::before { content: "✕"; position: absolute; left: 0; color: var(--cfa-red); font-weight: bold; }
+
+    .scorecard-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .scorecard-item {
+      border: 1px solid #D1D5DB; border-top: 2px solid var(--cfa-red);
+      border-radius: var(--radius-sm); padding: 5px 7px; background: #FAFAFA;
+    }
+    .scorecard-item strong { display: block; font-size: 0.68rem; color: var(--cfa-navy); margin-bottom: 2px; }
+    .scorecard-item span { font-size: 0.62rem; color: var(--cfa-muted); line-height: 1.25; display: block; }
+
+    .a4-footer {
+      border-top: 1px solid #D1D5DB;
+      padding-top: 6px; margin-top: 6px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.65rem; color: var(--cfa-muted);
+    }
+    .a4-footer .page-number { font-weight: 700; color: var(--cfa-navy); }
+
+    /* =========================================================
+       CALIBRATED 3-PAGE A4 PRINT & PDF STYLESHEET
+       ========================================================= */
+    @page {
+      size: A4 portrait;
+      margin: 10mm 12mm;
+    }
+
+    @media print {
+      *, *::before, *::after {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+        text-rendering: geometricPrecision !important;
+        box-sizing: border-box !important;
+      }
+
+      body {
+        background: #FFFFFF !important;
+        color: #1F2937 !important;
+        font-size: 8pt !important;
+        line-height: 1.3 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      .app-topbar,
+      .form-sidebar,
+      .preview-canvas-header,
+      .print-btn,
+      .no-print {
+        display: none !important;
+      }
+
+      .app-workspace {
+        display: block !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+
+      .preview-canvas {
+        background: none !important;
+        padding: 0 !important;
+        display: block !important;
+        overflow: visible !important;
+      }
+
+      .a4-page {
+        width: 100% !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        min-height: auto !important;
+      }
+
+      /* Exact 3-Page Splits */
+      #p-sec2 {
+        page-break-before: always !important;
+        break-before: page !important;
+        margin-top: 0 !important;
+      }
+
+      #p-sec4 {
+        page-break-before: always !important;
+        break-before: page !important;
+        margin-top: 0 !important;
+      }
+
+      .script-card,
+      .pillar-box,
+      .rule-card,
+      .dodont-card,
+      .scorecard-item,
+      tr {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      .header-hero-wrap {
+        height: 180px !important;
+        border-radius: 6px 6px 0 0 !important;
+        margin: 0 !important;
+      }
+
+      .header-hero-wrap::after { display: none !important; }
+
+      .guide-header {
+        background: #DD0031 !important;
+        border-radius: 0 0 6px 6px !important;
+        padding: 10px 14px 12px 14px !important;
+        margin-bottom: 6px !important;
+        box-shadow: none !important;
+        overflow: visible !important;
+      }
+
+      .guide-header::after { display: none !important; }
+
+      .header-eyebrow {
+        background: #BE002A !important;
+        border: 1px solid #E23D5B !important;
+        color: #FFFFFF !important;
+        opacity: 1 !important;
+      }
+
+      .header-title-row h1 {
+        color: #FFFFFF !important;
+        font-size: 1.25rem !important;
+        line-height: 1.15 !important;
+      }
+
+      .header-title-row p.subtitle {
+        color: #FFFFFF !important;
+        opacity: 1 !important;
+        font-size: 0.7rem !important;
+        line-height: 1.2 !important;
+      }
+
+      .metadata-grid {
+        border-top: 1px solid #E23D5B !important;
+        gap: 6px !important;
+        margin-top: 6px !important;
+        padding-top: 5px !important;
+      }
+
+      .meta-item {
+        background: #BE002A !important;
+        border: 1px solid #E23D5B !important;
+        opacity: 1 !important;
+        padding: 3px 6px !important;
+      }
+
+      .meta-label { color: #FEE2E2 !important; opacity: 1 !important; }
+      .meta-value { color: #FFFFFF !important; opacity: 1 !important; }
+
+      .huddle-banner {
+        background: #2a3348 !important;
+        padding: 6px 10px !important;
+        margin-bottom: 6px !important;
+      }
+
+      .section-card {
+        padding: 6px 10px !important;
+        margin-bottom: 6px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================
+       APP TOP BAR (CONTROLS & ACTIONS)
+       ========================================== -->
+  <header class="app-topbar no-print">
+    <div class="topbar-brand">
+      <span class="brand-badge">Chick-fil-A</span>
+      <span class="brand-title">Initiative Guide Builder</span>
+      <span class="brand-subtitle">• Customizable Ops &amp; Training Manual</span>
+    </div>
+
+    <div class="topbar-actions">
+      <!-- Preset Dropdown -->
+      <select id="presetSelector" class="preset-select" onchange="loadSelectedPreset(this.value)">
+        <option value="default">📋 Preset: Drive-Thru Suggestive Selling</option>
+        <option value="catering">🏈 Preset: Tailgate Kickoff &amp; Catering Drive</option>
+        <option value="breakfast">☕ Preset: Breakfast Speed &amp; Morning Add-ons</option>
+      </select>
+
+      <!-- Toggle Editor Panel -->
+      <button class="btn btn-toggle-editor" onclick="toggleSidebar()">
+        <span id="toggleIcon">◀</span> <span id="toggleText">Hide Editor</span>
+      </button>
+
+      <!-- Reset Defaults -->
+      <button class="btn btn-secondary" onclick="resetToDefault()" title="Reset current initiative to default">
+        ↺ Reset
+      </button>
+
+      <!-- Save & Load Template -->
+      <button class="btn btn-secondary" onclick="exportDataJSON()" title="Save your customized template as a JSON file">
+        💾 Export JSON
+      </button>
+
+      <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()" title="Load a saved JSON template">
+        📂 Import JSON
+      </button>
+      <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importDataJSON(event)">
+
+      <!-- Print / Export PDF -->
+      <button class="btn btn-primary" onclick="window.print()">
+        🖨️ Print / Save PDF
+      </button>
+    </div>
+  </header>
+
+  <!-- ==========================================
+       MAIN APP WORKSPACE
+       ========================================== -->
+  <div class="app-workspace">
+
+    <!-- LEFT SIDE: FORM EDITOR PANEL -->
+    <aside class="form-sidebar" id="formSidebar">
+      <div class="form-section-title">
+        <span>✏️</span> Customize Initiative Details
+      </div>
+
+      <!-- ACCORDION 1: HEADER & PROGRAM METADATA -->
+      <div class="accordion-card">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          1. Header &amp; Metadata
+        </div>
+        <div class="accordion-body">
+          <div class="form-group">
+            <label>Eyebrow Tagline</label>
+            <input type="text" id="f_eyebrow" class="form-control" oninput="updateField('header.eyebrow', this.value)">
+          </div>
+          <div class="form-group">
+            <label>Initiative Title</label>
+            <input type="text" id="f_title" class="form-control" oninput="updateField('header.title', this.value)">
+          </div>
+          <div class="form-group">
+            <label>Subtitle / Objective</label>
+            <textarea id="f_subtitle" class="form-control" oninput="updateField('header.subtitle', this.value)"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Hero Image</label>
+            <div class="image-picker-row">
+              <input type="text" id="f_img_src" class="form-control" placeholder="teammembers.jpg or URL" oninput="updateField('header.image_src', this.value)">
+              <label class="file-input-btn">
+                Browse...
+                <input type="file" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
+              </label>
+            </div>
+            <span style="font-size:0.65rem; color:#6B7280;">Upload local image or provide filename/URL.</span>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Meta 1 Label</label>
+              <input type="text" id="f_m1_l" class="form-control" oninput="updateField('header.meta1_label', this.value)">
+            </div>
+            <div class="form-group">
+              <label>Meta 1 Value</label>
+              <input type="text" id="f_m1_v" class="form-control" oninput="updateField('header.meta1_val', this.value)">
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Meta 2 Label</label>
+              <input type="text" id="f_m2_l" class="form-control" oninput="updateField('header.meta2_label', this.value)">
+            </div>
+            <div class="form-group">
+              <label>Meta 2 Value</label>
+              <input type="text" id="f_m2_v" class="form-control" oninput="updateField('header.meta2_val', this.value)">
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Meta 3 Label</label>
+              <input type="text" id="f_m3_l" class="form-control" oninput="updateField('header.meta3_label', this.value)">
+            </div>
+            <div class="form-group">
+              <label>Meta 3 Value</label>
+              <input type="text" id="f_m3_v" class="form-control" oninput="updateField('header.meta3_val', this.value)">
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Meta 4 Label</label>
+              <input type="text" id="f_m4_l" class="form-control" oninput="updateField('header.meta4_label', this.value)">
+            </div>
+            <div class="form-group">
+              <label>Meta 4 Value</label>
+              <input type="text" id="f_m4_v" class="form-control" oninput="updateField('header.meta4_val', this.value)">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCORDION 2: SHIFT HUDDLE -->
+      <div class="accordion-card closed">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          2. Shift Huddle Briefing
+        </div>
+        <div class="accordion-body">
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Huddle Tag</label>
+              <input type="text" id="f_h_tag" class="form-control" oninput="updateField('huddle.tag', this.value)">
+            </div>
+            <div class="form-group">
+              <label>Timing Note</label>
+              <input type="text" id="f_h_meta" class="form-control" oninput="updateField('huddle.meta', this.value)">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Huddle Title</label>
+            <input type="text" id="f_h_title" class="form-control" oninput="updateField('huddle.title', this.value)">
+          </div>
+          <div class="form-group">
+            <label>Our Goal</label>
+            <textarea id="f_h_goal" class="form-control" oninput="updateField('huddle.goal', this.value)"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Why It Matters</label>
+            <textarea id="f_h_why" class="form-control" oninput="updateField('huddle.why', this.value)"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Today's Focus</label>
+            <textarea id="f_h_focus" class="form-control" oninput="updateField('huddle.focus', this.value)"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCORDION 3: SECTION 1 (THREE PILLARS) -->
+      <div class="accordion-card closed">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          3. Section 1 (Three Pillars)
+        </div>
+        <div class="accordion-body">
+          <div style="font-weight:700; font-size:0.75rem; color:#DD0031; margin-bottom:6px;">Pillar 1: The Why</div>
+          <div class="form-row-2">
+            <input type="text" id="f_p1_title" class="form-control" placeholder="Title" oninput="updateField('pillars.p1_title', this.value)">
+            <input type="text" id="f_p1_sub" class="form-control" placeholder="Subtitle" oninput="updateField('pillars.p1_sub', this.value)">
+          </div>
+          <div class="form-group" style="margin-top:6px;">
+            <textarea id="f_p1_body" class="form-control" oninput="updateField('pillars.p1_body', this.value)"></textarea>
+          </div>
+
+          <div style="font-weight:700; font-size:0.75rem; color:#DD0031; margin:12px 0 6px 0;">Pillar 2: The Goal (Bullets)</div>
+          <div class="form-row-2">
+            <input type="text" id="f_p2_title" class="form-control" placeholder="Title" oninput="updateField('pillars.p2_title', this.value)">
+            <input type="text" id="f_p2_sub" class="form-control" placeholder="Subtitle" oninput="updateField('pillars.p2_sub', this.value)">
+          </div>
+          <div class="form-group" style="margin-top:6px;">
+            <label style="font-size:0.65rem;">Bullets (1 per line)</label>
+            <textarea id="f_p2_bullets" class="form-control" style="min-height:75px;" oninput="updatePillarBullets(this.value)"></textarea>
+          </div>
+
+          <div style="font-weight:700; font-size:0.75rem; color:#DD0031; margin:12px 0 6px 0;">Pillar 3: The Experience</div>
+          <div class="form-row-2">
+            <input type="text" id="f_p3_title" class="form-control" placeholder="Title" oninput="updateField('pillars.p3_title', this.value)">
+            <input type="text" id="f_p3_sub" class="form-control" placeholder="Subtitle" oninput="updateField('pillars.p3_sub', this.value)">
+          </div>
+          <div class="form-group" style="margin-top:6px;">
+            <textarea id="f_p3_body" class="form-control" oninput="updateField('pillars.p3_body', this.value)"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCORDION 4: SECTION 2 (SCRIPTING PLAYBOOK - 6 CARDS) -->
+      <div class="accordion-card closed">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          4. Section 2 (Scripting Playbook &amp; CTA)
+        </div>
+        <div class="accordion-body">
+          <div id="scriptFormContainer">
+            <!-- Dynamically populated 6 cards -->
+          </div>
+
+          <div style="font-weight:700; font-size:0.75rem; color:#D97706; margin:12px 0 6px 0;">Guest Response Transitions</div>
+          <div class="form-group">
+            <label>When Guest Says Yes</label>
+            <textarea id="f_cta_yes" class="form-control" oninput="updateField('cta.yes', this.value)"></textarea>
+          </div>
+          <div class="form-group">
+            <label>When Guest Says No</label>
+            <textarea id="f_cta_no" class="form-control" oninput="updateField('cta.no', this.value)"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCORDION 5: SECTION 3 (THE TWO GOLDEN RULES) -->
+      <div class="accordion-card closed">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          5. Section 3 (Two Golden Rules)
+        </div>
+        <div class="accordion-body">
+          <div style="font-weight:700; font-size:0.75rem; color:#DD0031; margin-bottom:6px;">Rule 1</div>
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="f_r1_title" class="form-control" oninput="updateField('rules.0.title', this.value)">
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="f_r1_body" class="form-control" oninput="updateField('rules.0.body', this.value)"></textarea>
+          </div>
+
+          <div style="font-weight:700; font-size:0.75rem; color:#DD0031; margin:12px 0 6px 0;">Rule 2</div>
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="f_r2_title" class="form-control" oninput="updateField('rules.1.title', this.value)">
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="f_r2_body" class="form-control" oninput="updateField('rules.1.body', this.value)"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCORDION 6: SECTION 4 (4-WEEK ROTATION SCHEDULE) -->
+      <div class="accordion-card closed">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          6. Section 4 (4-Week Schedule Table)
+        </div>
+        <div class="accordion-body" id="cadenceFormContainer">
+          <!-- Dynamically populated 4 rows -->
+        </div>
+      </div>
+
+      <!-- ACCORDION 7: SECTION 5 (OPERATIONAL GUARDRAILS) -->
+      <div class="accordion-card closed">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          7. Section 5 (Do's &amp; Don'ts)
+        </div>
+        <div class="accordion-body">
+          <div class="form-group">
+            <label style="color:var(--cfa-green);">Things To Do (1 item per line)</label>
+            <textarea id="f_dos" class="form-control" style="min-height:90px;" oninput="updateGuardrails('dos', this.value)"></textarea>
+          </div>
+          <div class="form-group">
+            <label style="color:var(--cfa-red);">Things To Avoid (1 item per line)</label>
+            <textarea id="f_donts" class="form-control" style="min-height:90px;" oninput="updateGuardrails('donts', this.value)"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCORDION 8: SECTION 6 (AUDIT CHECKLIST & FOOTER) -->
+      <div class="accordion-card closed">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          8. Section 6 (Checklist &amp; Footer)
+        </div>
+        <div class="accordion-body">
+          <div id="scorecardFormContainer">
+            <!-- Dynamically populated 5 items -->
+          </div>
+          <div class="form-group" style="margin-top:12px;">
+            <label>Document Footer Text</label>
+            <input type="text" id="f_footer" class="form-control" oninput="updateField('footer', this.value)">
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- RIGHT SIDE: LIVE A4 PREVIEW CANVAS -->
+    <main class="preview-canvas">
+      
+      <div class="preview-canvas-header no-print">
+        <span>📄 Live Print Preview (3-Page Calibrated A4 Layout)</span>
+        <span>Automatic Real-Time Sync</span>
+      </div>
+
+      <!-- ==========================================
+           A4 PAGE 1: HEADER + HUDDLE + SECTION 1
+           ========================================== -->
+      <div class="a4-page" id="page-1">
+        <div class="page-content">
+
+          <!-- Unified Card Top: Hero Image -->
+          <div class="header-hero-wrap">
+            <img id="p_hero_img" src="teammembers.jpg" alt="Chick-fil-A Team Members" class="header-hero-img">
+          </div>
+
+          <!-- Unified Card Bottom: Header Info -->
+          <header class="guide-header">
+            <div id="p_eyebrow" class="header-eyebrow">Team Communication &amp; Continuous Coaching Guide</div>
+            <div class="header-title-row">
+              <div>
+                <h1 id="p_title">Drive-Thru Suggestive Selling Playbook</h1>
+                <p id="p_subtitle" class="subtitle">A continuous coaching framework to help Team Members anticipate guest cravings, elevate the meal experience, and build check average through Second-Mile hospitality.</p>
+              </div>
+            </div>
+
+            <div class="metadata-grid">
+              <div class="meta-item">
+                <div id="p_m1_l" class="meta-label">What It Is</div>
+                <div id="p_m1_v" class="meta-value">Continuous Drive-Thru Coaching Program</div>
+              </div>
+              <div class="meta-item">
+                <div id="p_m2_l" class="meta-label">Target Roles</div>
+                <div id="p_m2_v" class="meta-value">IPOS Order Takers, Headset, Baggers &amp; Trainers</div>
+              </div>
+              <div class="meta-item">
+                <div id="p_m3_l" class="meta-label">Core Benchmark</div>
+                <div id="p_m3_v" class="meta-value">1 Specific Suggestion / Car • Zero Line Delay</div>
+              </div>
+              <div class="meta-item">
+                <div id="p_m4_l" class="meta-label">Primary Goal</div>
+                <div id="p_m4_v" class="meta-value">+15% Large Meal &amp; Dessert Mix</div>
+              </div>
+            </div>
+          </header>
+
+          <!-- Shift Huddle Banner -->
+          <section class="huddle-banner">
+            <div class="huddle-header">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span id="p_h_tag" class="huddle-tag">Shift Huddle</span>
+                <span id="p_h_title" class="huddle-title">Ready-to-Use 60-Second Team Briefing</span>
+              </div>
+              <span id="p_h_meta" class="huddle-meta">Deliver at pre-rush transition (11:00 AM &amp; 5:00 PM)</span>
+            </div>
+            <div class="huddle-grid">
+              <div class="huddle-cell">
+                <h5>Our Goal</h5>
+                <p id="p_h_goal">Deliver remarkable hospitality while increasing our Large Meal and Hand-Spun Treat mix by +15%.</p>
+              </div>
+              <div class="huddle-cell">
+                <h5>Why It Matters</h5>
+                <p id="p_h_why">Suggestive selling isn’t pitching—it's Second-Mile Service. Guests love treats and complete meals; we just need to remind them!</p>
+              </div>
+              <div class="huddle-cell">
+                <h5>Today's Focus</h5>
+                <p id="p_h_focus">Name a specific item on every order! Ask: "Would you like to make that a large fry and large drink today?" or treat them to a shake.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 1: What The Team Needs To Know -->
+          <section class="section-card">
+            <div class="section-header">
+              <div class="section-icon-wrap">
+                <svg class="cfa-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M24 40S8 29 8 18C8 12 13 8 18 8C21 8 23 10 24 12C25 10 27 8 30 8C35 8 40 12 40 18C40 29 24 40 24 40Z" stroke="#DD0031" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M19 22C20 25 24 26 28 23" stroke="#DD0031" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h2>What The Team Needs To Know</h2>
+            </div>
+
+            <div class="three-pillar-grid">
+              <div class="pillar-box">
+                <h3 id="p_p1_title">The Why</h3>
+                <div id="p_p1_sub" class="pillar-subtitle">Why are we doing this?</div>
+                <p id="p_p1_body">Suggestive selling is an extension of Second-Mile Service. Guests often don’t think about treats or size upgrades when rushing through the drive-thru. By anticipating their cravings with genuine care, we complete their dining experience while driving restaurant growth.</p>
+              </div>
+
+              <div class="pillar-box">
+                <h3 id="p_p2_title">The Goal</h3>
+                <div id="p_p2_sub" class="pillar-subtitle">What are we trying to accomplish?</div>
+                <ul id="p_p2_bullets">
+                  <!-- Dynamically populated bullets -->
+                </ul>
+              </div>
+
+              <div class="pillar-box">
+                <h3 id="p_p3_title">The Experience</h3>
+                <div id="p_p3_sub" class="pillar-subtitle">What the guest receives</div>
+                <p id="p_p3_body">A welcoming, personal, and seamless interaction where the guest feels valued, receives delicious pairings tailored to their meal, and leaves with a smile after experiencing authentic "My Pleasure" hospitality.</p>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <footer class="a4-footer">
+          <span id="p_footer_p1">Chick-fil-A Operations • Initiative Guide</span>
+          <span class="page-number">Page 1 of 3 • Foundations &amp; Shift Huddle</span>
+        </footer>
+      </div>
+
+      <!-- ==========================================
+           A4 PAGE 2: SCRIPTING PLAYBOOK & GOLDEN RULES
+           ========================================== -->
+      <div class="a4-page" id="page-2">
+        <div class="page-content">
+
+          <!-- Section 2: What Do We Say To Guests? -->
+          <section class="section-card" id="p-sec2">
+            <div class="section-header">
+              <div class="section-icon-wrap">
+                <svg class="cfa-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="10" y="8" width="28" height="32" rx="4" stroke="#DD0031" stroke-width="2.5"/>
+                  <rect x="14" y="12" width="20" height="22" rx="2" stroke="#DD0031" stroke-width="1.8"/>
+                  <circle cx="24" cy="36" r="1.5" fill="#DD0031"/>
+                  <rect x="36" y="16" width="6" height="12" rx="1.5" stroke="#DD0031" stroke-width="2"/>
+                </svg>
+              </div>
+              <h2>What Do We Say To Guests? (Scripting Playbook)</h2>
+            </div>
+
+            <p style="font-size: 0.72rem; color: #4B5563; margin-bottom: 8px;">
+              Team Members should memorize these natural prompts. Listen to the order, identify the trigger, and offer <strong>one specific item</strong> before totaling.
+            </p>
+
+            <div class="script-grid" id="p_script_grid">
+              <!-- Dynamically populated 6 cards -->
+            </div>
+
+            <!-- CTA Box -->
+            <div class="cta-box">
+              <h4>Guest Response Transitions (Closing The Suggestion With Hospitality)</h4>
+              <div class="cta-dialogues">
+                <div class="cta-dialogue-item">
+                  <strong>When Guest Says "Yes!":</strong>
+                  <span id="p_cta_yes">"Awesome choice, you'll love it! Your total is $12.45. It's our absolute pleasure to serve you today!"</span>
+                </div>
+                <div class="cta-dialogue-item">
+                  <strong>When Guest Says "No thanks":</strong>
+                  <span id="p_cta_no">"No problem at all! Your total is $9.20. Pull right forward to the window, and have a wonderful day!"</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 3: What We Need From The Team (The Two Golden Rules) -->
+          <section class="section-card" id="p-sec3">
+            <div class="section-header">
+              <div class="section-icon-wrap">
+                <svg class="cfa-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="24" cy="24" r="18" stroke="#DD0031" stroke-width="2.5"/>
+                  <path d="M24 16V26" stroke="#DD0031" stroke-width="2.5" stroke-linecap="round"/>
+                  <circle cx="24" cy="32" r="1.5" fill="#DD0031"/>
+                </svg>
+              </div>
+              <h2>What We Need From The Team (The Two Golden Rules)</h2>
+            </div>
+
+            <div class="rules-grid">
+              <div class="rule-card">
+                <div class="rule-number" id="p_r1_num">1</div>
+                <div class="rule-content">
+                  <h4 id="p_r1_title">Specificity Wins — Retire "Anything Else?"</h4>
+                  <p id="p_r1_body">Asking open-ended, passive questions like "Will that be all?" or "Anything else for you?" triggers an automatic, subconscious "No." Always name a specific, craveable item (e.g., "large waffle fry", "Cookies &amp; Cream shake"). Craveable words create visual appetite appeal!</p>
+                </div>
+              </div>
+
+              <div class="rule-card">
+                <div class="rule-number" id="p_r2_num">2</div>
+                <div class="rule-content">
+                  <h4 id="p_r2_title">The "One-and-Done" Rule &amp; Speed of Service</h4>
+                  <p id="p_r2_body">We never badger guests or stack multiple upsells. Ask one natural, well-timed suggestion. If the guest declines, accept it cheerfully and instantly finalize the transaction. Never let a recommendation compromise queue flow or drive-thru speed.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <footer class="a4-footer">
+          <span id="p_footer_p2">Chick-fil-A Operations • Initiative Guide</span>
+          <span class="page-number">Page 2 of 3 • Lane Scripting &amp; Team Expectations</span>
+        </footer>
+      </div>
+
+      <!-- ==========================================
+           A4 PAGE 3: CADENCE, GUARDRAILS, AUDIT
+           ========================================== -->
+      <div class="a4-page" id="page-3">
+        <div class="page-content">
+
+          <!-- Section 4: Continuous 4-Week Focus Rotation -->
+          <section class="section-card" id="p-sec4">
+            <div class="section-header">
+              <div class="section-icon-wrap">
+                <svg class="cfa-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="8" y="10" width="32" height="30" rx="3" stroke="#DD0031" stroke-width="2.5"/>
+                  <path d="M8 18H40" stroke="#DD0031" stroke-width="2"/>
+                  <circle cx="16" cy="26" r="2" fill="#DD0031"/>
+                  <circle cx="24" cy="26" r="2" fill="#DD0031"/>
+                  <circle cx="32" cy="26" r="2" fill="#DD0031"/>
+                </svg>
+              </div>
+              <h2>Continuous Focus Rotation &amp; Cadence</h2>
+            </div>
+
+            <table class="cadence-table">
+              <thead>
+                <tr>
+                  <th style="width:13%;">Timeframe</th>
+                  <th style="width:23%;">Primary Focus</th>
+                  <th style="width:34%;">Featured Suggestion Script</th>
+                  <th style="width:30%;">Target Shift Metric &amp; Action</th>
+                </tr>
+              </thead>
+              <tbody id="p_cadence_tbody">
+                <!-- Dynamically populated 4 rows -->
+              </tbody>
+            </table>
+          </section>
+
+          <!-- Section 5: Operational Guardrails -->
+          <section class="section-card" id="p-sec5">
+            <div class="section-header">
+              <div class="section-icon-wrap">
+                <svg class="cfa-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="24" cy="26" r="16" stroke="#DD0031" stroke-width="2.5"/>
+                  <path d="M24 10V6M21 6H27" stroke="#DD0031" stroke-width="2.5" stroke-linecap="round"/>
+                  <path d="M24 26L24 17M24 26L31 26" stroke="#DD0031" stroke-width="2.2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h2>Operational Guardrails</h2>
+            </div>
+
+            <div class="dodont-grid">
+              <div class="dodont-card do">
+                <div class="dodont-header">Things To Do (Hospitality &amp; Speed)</div>
+                <ul class="dodont-list" id="p_dos_list">
+                  <!-- Populated dynamically -->
+                </ul>
+              </div>
+
+              <div class="dodont-card dont">
+                <div class="dodont-header">Things To Avoid (Pitches &amp; Delays)</div>
+                <ul class="dodont-list" id="p_donts_list">
+                  <!-- Populated dynamically -->
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 6: Trainer 5-Car Audit Checklist -->
+          <section class="section-card" id="p-sec6">
+            <div class="section-header">
+              <div class="section-icon-wrap">
+                <svg class="cfa-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="24" cy="14" r="5" stroke="#DD0031" stroke-width="2.2"/>
+                  <path d="M16 32C16 26 19 23 24 23C29 23 32 26 32 32" stroke="#DD0031" stroke-width="2.2" stroke-linecap="round"/>
+                  <circle cx="12" cy="18" r="4" stroke="#DD0031" stroke-width="2"/>
+                  <circle cx="36" cy="18" r="4" stroke="#DD0031" stroke-width="2"/>
+                </svg>
+              </div>
+              <h2>Trainer &amp; Shift Leader 5-Car Audit Checklist</h2>
+            </div>
+
+            <p style="font-size: 0.68rem; color: #4B5563; margin-bottom: 6px;">
+              Shift Leaders shadow each order taker for 5 consecutive vehicles. Aim for a <strong>3:1 ratio</strong> of positive reinforcement to constructive feedback.
+            </p>
+
+            <div class="scorecard-grid" id="p_scorecard_grid">
+              <!-- Dynamically populated 5 items -->
+            </div>
+          </section>
+
+        </div>
+
+        <footer class="a4-footer">
+          <span id="p_footer_p3">Chick-fil-A Operations • Continuous Training Guide • Round Rock, TX</span>
+          <span class="page-number">Page 3 of 3 • Leadership &amp; Quality Assurance</span>
+        </footer>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    const PRESETS = {
+  "default": {
+    "header": {
+      "eyebrow": "Team Communication & Continuous Coaching Guide",
+      "title": "Drive-Thru Suggestive Selling Playbook",
+      "subtitle": "A continuous coaching framework to help Team Members anticipate guest cravings, elevate the meal experience, and build check average through Second-Mile hospitality.",
+      "image_src": "teammembers.jpg",
+      "meta1_label": "What It Is",
+      "meta1_val": "Continuous Drive-Thru Coaching Program",
+      "meta2_label": "Target Roles",
+      "meta2_val": "IPOS Order Takers, Headset, Baggers & Trainers",
+      "meta3_label": "Core Benchmark",
+      "meta3_val": "1 Specific Suggestion / Car \u2022 Zero Line Delay",
+      "meta4_label": "Primary Goal",
+      "meta4_val": "+15% Large Meal & Dessert Mix"
+    },
+    "huddle": {
+      "tag": "Shift Huddle",
+      "title": "Ready-to-Use 60-Second Team Briefing",
+      "meta": "Deliver at pre-rush transition (11:00 AM & 5:00 PM)",
+      "goal": "Deliver remarkable hospitality while increasing our Large Meal and Hand-Spun Treat mix by +15%.",
+      "why": "Suggestive selling isn\u2019t pitching\u2014it's Second-Mile Service. Guests love treats and complete meals; we just need to remind them!",
+      "focus": "Name a specific item on every order! Ask: \"Would you like to make that a large fry and large drink today?\" or treat them to a shake."
+    },
+    "pillars": {
+      "p1_title": "The Why",
+      "p1_sub": "Why are we doing this?",
+      "p1_body": "Suggestive selling is an extension of Second-Mile Service. Guests often don\u2019t think about treats or size upgrades when rushing through the drive-thru. By anticipating their cravings with genuine care, we complete their dining experience while driving restaurant growth.",
+      "p2_title": "The Goal",
+      "p2_sub": "What are we trying to accomplish?",
+      "p2_bullets": [
+        "Intentional Hospitality: Replace passive questions with 1 craveable, specific suggestion per transaction.",
+        "Check Average Growth: Lift Large Fry/Drink conversion and hand-spun dessert sales across all shifts.",
+        "Speed of Service (SOS): Keep suggestions under 4 seconds so line momentum never slows down."
+      ],
+      "p3_title": "The Experience",
+      "p3_sub": "What the guest receives",
+      "p3_body": "A welcoming, personal, and seamless interaction where the guest feels valued, receives delicious pairings tailored to their meal, and leaves with a smile after experiencing authentic \"My Pleasure\" hospitality."
+    },
+    "scripts": [
+      {
+        "category": "1. Meal Size Optimization",
+        "trigger": "Guest orders a standard meal (e.g., \"#1 Chick-fil-A Sandwich Meal\")",
+        "say": "Would you like to make that a large fry and large drink today?",
+        "tip_prefix": "Tip:",
+        "tip_text": "Always bundle fry and drink together in one effortless question rather than asking separately.",
+        "tip_quote": ""
+      },
+      {
+        "category": "2. Hand-Spun Treats",
+        "trigger": "Guest finishes ordering meals or during afternoon lull (1:30\u20135 PM)",
+        "say": "Can we treat you to a hand-spun Cookies & Cream milkshake or a warm brownie today?",
+        "tip_prefix": "Tip:",
+        "tip_text": "Using the phrase sounds warm and celebratory rather than transactional.",
+        "tip_quote": "\"Can we treat you...\""
+      },
+      {
+        "category": "3. Specialty Beverages",
+        "trigger": "Guest asks for tea, soft drink, or hasn't selected a beverage",
+        "say": "Would you like to try that with our fresh-squeezed lemonade or a Sunjoy today?",
+        "tip_prefix": "Tip:",
+        "tip_text": "Introducing proprietary items like Sunjoys and fresh lemonade drives high guest loyalty.",
+        "tip_quote": ""
+      },
+      {
+        "category": "4. Morning Enhancements",
+        "trigger": "Breakfast entr\u00e9e ordered (e.g., Chicken Biscuit or Minis)",
+        "say": "Would you like to add crispy hash browns or an iced cold brew coffee to start your morning?",
+        "tip_prefix": "Tip:",
+        "tip_text": "Breakfast guests prioritize energy and crunch. Hash browns are the fastest add-on in the lane.",
+        "tip_quote": ""
+      },
+      {
+        "category": "5. Entr\u00e9e-to-Meal Conversion",
+        "trigger": "Guest asks for single sandwich or 8-count nuggets only",
+        "say": "Would you like to make that a meal with waffle potato fries and a drink?",
+        "tip_prefix": "Tip:",
+        "tip_text": "Many guests say the entr\u00e9e first intending to add fries. Asking saves seconds later in the order.",
+        "tip_quote": ""
+      },
+      {
+        "category": "6. Group & Family Add-ons",
+        "trigger": "Large car order with multiple meals or kids meals",
+        "say": "Can we add a 6-pack of warm chocolate chip cookies or a gallon of sweet tea for the family?",
+        "tip_prefix": "Tip:",
+        "tip_text": "A single gallon of iced tea or cookie pack adds immediate value for family dinner runs.",
+        "tip_quote": ""
+      }
+    ],
+    "cta": {
+      "yes": "\"Awesome choice, you'll love it! Your total is 2.45. It's our absolute pleasure to serve you today!\"",
+      "no": "\"No problem at all! Your total is .20. Pull right forward to the window, and have a wonderful day!\""
+    },
+    "rules": [
+      {
+        "num": "1",
+        "title": "Specificity Wins \u2014 Retire \"Anything Else?\"",
+        "body": "Asking open-ended, passive questions like \"Will that be all?\" or \"Anything else for you?\" triggers an automatic, subconscious \"No.\" Always name a specific, craveable item (e.g., \"large waffle fry\", \"Cookies & Cream shake\"). Craveable words create visual appetite appeal!"
+      },
+      {
+        "num": "2",
+        "title": "The \"One-and-Done\" Rule & Speed of Service",
+        "body": "We never badger guests or stack multiple upsells. Ask one natural, well-timed suggestion. If the guest declines, accept it cheerfully and instantly finalize the transaction. Never let a recommendation compromise queue flow or drive-thru speed."
+      }
+    ],
+    "cadence": [
+      {
+        "week": "Week 1",
+        "focus": "Meal Size Upgrades",
+        "script": "\"Would you like to make that a large fry and large drink today?\"",
+        "metric": "+20% Large fry & beverage mix",
+        "action": "Listen for smooth, bundled phrasing during lunch & dinner peak."
+      },
+      {
+        "week": "Week 2",
+        "focus": "Signature Drinks & Sunjoys",
+        "script": "\"Can we get you our fresh-squeezed lemonade or a Sunjoy today?\"",
+        "metric": "+15% Specialty beverage volume",
+        "action": "Coach order takers to suggest seasonal and specialty beverage options."
+      },
+      {
+        "week": "Week 3",
+        "focus": "Hand-Spun Treats & Shakes",
+        "script": "\"Can we treat you to a hand-spun Cookies & Cream milkshake today?\"",
+        "metric": "+25 Shake/Dessert units per hour",
+        "action": "Focus on afternoon lull (1:30\u20135 PM) and post-dinner treat rushes."
+      },
+      {
+        "week": "Week 4",
+        "focus": "Breakfast Crunch & Coffee",
+        "script": "\"Would you like to add crispy hash browns or a cold brew iced coffee?\"",
+        "metric": "+15% Breakfast side attachment",
+        "action": "Shadow 6:30\u20139:00 AM lanes; reward fastest hash brown additions."
+      }
+    ],
+    "guardrails": {
+      "dos": [
+        "Suggest immediately after the base item is entered on the POS.",
+        "Name specific, mouth-watering items (\"Cookies & Cream milkshake\").",
+        "Maintain eye contact and a genuine smile (Face-to-Face IPOS).",
+        "Accept declines effortlessly: \"You got it! Your total is...\""
+      ],
+      "donts": [
+        "Don't interrupt guests while they are speaking or reviewing the menu.",
+        "Don't ask vague questions like \"Do you want anything else?\"",
+        "Don't push a second suggestion after the guest has already said no.",
+        "Don't upsell during severe line-stall emergencies or system resets."
+      ]
+    },
+    "scorecard": [
+      {
+        "title": "1. Warm Greeting",
+        "desc": "Smiled, made eye contact, welcomed the guest with genuine warmth."
+      },
+      {
+        "title": "2. Perfect Timing",
+        "desc": "Suggested at the natural pause before payment tender or storing."
+      },
+      {
+        "title": "3. Named Specific Item",
+        "desc": "Used craveable naming (e.g. \"large fry & drink\" vs \"anything else\")."
+      },
+      {
+        "title": "4. Graceful Response",
+        "desc": "Cheerfully confirmed acceptance or rejection without hesitation."
+      },
+      {
+        "title": "5. Stored & Sequenced",
+        "desc": "Stored order quickly to keep drive-thru queue moving forward."
+      }
+    ],
+    "footer": "Chick-fil-A Drive-Thru Operations \u2022 Continuous Training Guide \u2022 Round Rock, TX \u2022 It's Our Pleasure to Serve You"
+  },
+  "catering": {
+    "header": {
+      "eyebrow": "Team Communication & Marketing Guide",
+      "title": "Tailgater Kickoff Giveaway & Catering Drive",
+      "subtitle": "A team guide to build awareness for Chick-fil-A catering, drive social media engagement, and expand our small-to-medium catering orders for game days and watch parties.",
+      "image_src": "teammembers.jpg",
+      "meta1_label": "What It Is",
+      "meta1_val": "Catering Growth & Social Campaign",
+      "meta2_label": "Target Dates",
+      "meta2_val": "September 2nd \u2013 26th",
+      "meta3_label": "Target Roles",
+      "meta3_val": "Front Counter, Drive-Thru & Shift Leaders",
+      "meta4_label": "Primary Goal",
+      "meta4_val": "5x 00\u201300 Catering Orders & +50 Follows"
+    },
+    "huddle": {
+      "tag": "Shift Huddle",
+      "title": "Ready-to-Use 60-Second Team Briefing",
+      "meta": "Deliver at pre-rush huddle during campaign window",
+      "goal": "Build awareness of our watch-party and tailgate catering capabilities.",
+      "why": "Building interest in everyday catering drives high-ticket guest relationships!",
+      "focus": "Mention our Instagram tailgate giveaway to every guest ordering for groups or families."
+    },
+    "pillars": {
+      "p1_title": "The Why",
+      "p1_sub": "Why are we doing this?",
+      "p1_body": "We want to have a powerful local presence to communicate personally with our community. Highlighting catering for everyday watch parties shows guests how effortless game-day food can be.",
+      "p2_title": "The Goal",
+      "p2_sub": "What are we trying to accomplish?",
+      "p2_bullets": [
+        "Build Social Engagement: Gain +50 genuine local followers on Instagram.",
+        "Drive Small-to-Medium Orders: Secure 5+ new 00\u201300 catering orders for weekend games.",
+        "Catering Knowledge: Ensure all guests know about nuggets, strips, and cookie platters."
+      ],
+      "p3_title": "The Offer",
+      "p3_sub": "What the guest receives",
+      "p3_body": "Three lucky winners receive a 00 credit toward their next tailgate or watch party order, plus a Chick-fil-A tailgating goody bag with a football cow and stadium cups!"
+    },
+    "scripts": [
+      {
+        "category": "1. Social Contest Pitch",
+        "trigger": "Guest mentions sports, weekend plans, or has children in sports gear",
+        "say": "Are you watching the game this weekend? We're giving away a free 00 catering spread on Instagram!",
+        "tip_prefix": "Tip:",
+        "tip_text": "Mention our Instagram handle so guests can enter while waiting for their food.",
+        "tip_quote": ""
+      },
+      {
+        "category": "2. Group Order Add-on",
+        "trigger": "Guest orders 3+ meals or large quantity of food",
+        "say": "Did you know you can order our hot nugget and strip trays ahead for weekend watch parties?",
+        "tip_prefix": "Tip:",
+        "tip_text": "Direct them to the Chick-fil-A App for effortless catering pickup.",
+        "tip_quote": ""
+      },
+      {
+        "category": "3. Beverage Platter Add",
+        "trigger": "Guest orders catering tray or asks about party sides",
+        "say": "Can we add a gallon of freshly-brewed Sweet Tea or Fresh Lemonade for the crew?",
+        "tip_prefix": "Tip:",
+        "tip_text": "Gallons are the highest margin, easiest add-on for catering.",
+        "tip_quote": ""
+      },
+      {
+        "category": "4. Sweet Endings",
+        "trigger": "Guest finalizing a party or catering order",
+        "say": "Would you like to add a tray of our warm chocolate chip cookies or chocolate fudge brownies?",
+        "tip_prefix": "Tip:",
+        "tip_text": "Dessert trays require zero prep time during rush and delight guests.",
+        "tip_quote": ""
+      },
+      {
+        "category": "5. App Ordering Pitch",
+        "trigger": "Guest asks how far in advance to order catering",
+        "say": "You can order right through your Chick-fil-A App up to 30 days ahead and earn Chick-fil-A One points!",
+        "tip_prefix": "Tip:",
+        "tip_text": "Remind them they earn points on large orders.",
+        "tip_quote": ""
+      },
+      {
+        "category": "6. Game Day Call-Out",
+        "trigger": "Friday or Saturday morning drive-thru traffic",
+        "say": "Picking up food for game day? Ask about our reheat trays to enjoy fresh anytime during kickoff!",
+        "tip_prefix": "Tip:",
+        "tip_text": "Chilled nugget trays let guests reheat right at halftime.",
+        "tip_quote": ""
+      }
+    ],
+    "cta": {
+      "yes": "\"Awesome! Just check out our latest Instagram post, like it, and tag your team to enter. It's our pleasure!\"",
+      "no": "\"No problem at all! You can always order party trays anytime right through the CFA app. Have a great weekend!\""
+    },
+    "rules": [
+      {
+        "num": "1",
+        "title": "Know How To Coach Guests",
+        "body": "Keep the pitch natural and friendly: 2\u20133 sentences about the Instagram giveaway and how easy it is to enter. If a guest asks about placing a catering order, connect them with a shift leader."
+      },
+      {
+        "num": "2",
+        "title": "Team Confidence & Execution",
+        "body": "Relax, leadership has the logistics covered! Focus on friendly hospitality, sharing the excitement for kickoff season, and distributing catering promo cards with receipt bags."
+      }
+    ],
+    "cadence": [
+      {
+        "week": "Sept 2",
+        "focus": "Campaign Kickoff",
+        "script": "\"Check our Instagram for a chance to win a 00 tailgate spread!\"",
+        "metric": "+25 Instagram Followers",
+        "action": "Ensure all team members know the promo details at shift huddles."
+      },
+      {
+        "week": "Sept 10",
+        "focus": "Winner Drawing",
+        "script": "\"Winners are being drawn today for our 00 watch party spread!\"",
+        "metric": "3 Winners Contacted",
+        "action": "Leadership draws winners and logs orders into POS."
+      },
+      {
+        "week": "Sept 17",
+        "focus": "Weekend Push",
+        "script": "\"Ordering for the game? Check out our hot nugget and strip trays!\"",
+        "metric": "3x Weekend Tray Orders",
+        "action": "Coach front counter to hand out catering menus with large orders."
+      },
+      {
+        "week": "Sept 26",
+        "focus": "Final Pickup Deadline",
+        "script": "\"Don't forget to redeem your watch party credits by Saturday!\"",
+        "metric": "100% Redemption Rate",
+        "action": "Ensure kitchen prepares winners' orders with VIP care."
+      }
+    ],
+    "guardrails": {
+      "dos": [
+        "Hand out catering brochures with large family and office orders.",
+        "Mention the Chick-fil-A App for easy advance ordering.",
+        "Congratulate guests wearing football jerseys and ask about their tailgate plans.",
+        "Direct any bulk questions (over 00) immediately to the Director of Sales."
+      ],
+      "donts": [
+        "Don't promise custom tray sizes that aren't on the official CFA catering menu.",
+        "Don't take complex payment details over the drive-thru speaker.",
+        "Don't forget to include serving utensils, tongs, and sauces with trays.",
+        "Don't hesitate to ask leadership if a guest wants next-day catering."
+      ]
+    },
+    "scorecard": [
+      {
+        "title": "1. Energy & Smile",
+        "desc": "Brought game-day excitement and warm hospitality to every guest interaction."
+      },
+      {
+        "title": "2. Natural Pitch",
+        "desc": "Shared the Instagram promo smoothly without delaying the order flow."
+      },
+      {
+        "title": "3. Bag Stuffer Given",
+        "desc": "Placed catering promo postcard into group orders and multi-meal bags."
+      },
+      {
+        "title": "4. Menu Knowledge",
+        "desc": "Confidently named popular items: Nugget Trays, Sunjoys, and Cookie Trays."
+      },
+      {
+        "title": "5. Order Referral",
+        "desc": "Referred guests interested in big corporate events to the store catering lead."
+      }
+    ],
+    "footer": "Chick-fil-A Store Operations & Marketing \u2022 Continuous Initiative Guide \u2022 Round Rock, TX"
+  },
+  "breakfast": {
+    "header": {
+      "eyebrow": "Team Communication & Morning Speed Guide",
+      "title": "Breakfast Speed & Morning Add-on Initiative",
+      "subtitle": "A targeted morning coaching guide to accelerate breakfast drive-thru throughput, elevate signature morning pairings, and increase breakfast check average.",
+      "image_src": "teammembers.jpg",
+      "meta1_label": "What It Is",
+      "meta1_val": "Morning Rush Drive-Thru Initiative",
+      "meta2_label": "Target Daypart",
+      "meta2_val": "Breakfast (6:30 AM \u2013 10:30 AM)",
+      "meta3_label": "Target Roles",
+      "meta3_val": "IPOS, Headset, Window & Bagger",
+      "meta4_label": "Primary Goal",
+      "meta4_val": "+20% Hash Browns & Specialty Coffee Mix"
+    },
+    "huddle": {
+      "tag": "Morning Huddle",
+      "title": "Ready-to-Use 60-Second Morning Huddle",
+      "meta": "Deliver at 6:15 AM before morning rush kicks off",
+      "goal": "Deliver blazing fast morning service while pairing every biscuit with hash browns or cold brew.",
+      "why": "Breakfast guests are in a rush. Anticipating their coffee and potato needs makes their morning effortless!",
+      "focus": "Ask every breakfast guest: \"Would you like to add crispy hash browns or an iced cold brew coffee today?\""
+    },
+    "pillars": {
+      "p1_title": "The Why",
+      "p1_sub": "Why breakfast matters",
+      "p1_body": "Morning drive-thru speed builds life-long habits. When we pair hearty breakfast entr\u00e9es with hot coffee and golden hash browns in under 30 seconds, we win the guest's morning routine for life.",
+      "p2_title": "The Goal",
+      "p2_sub": "What are we targeting?",
+      "p2_bullets": [
+        "Speed Benchmark: Keep total order entry time under 18 seconds per car.",
+        "Side Conversion: Increase hash brown attachment rate from 38% to 55%.",
+        "Specialty Coffee: Grow cold brew iced coffee and frosted coffee sales by +25%."
+      ],
+      "p3_title": "The Experience",
+      "p3_sub": "What the guest feels",
+      "p3_body": "A fast, cheerful, and energized morning greeting that kickstarts the guest's commute with hot, fresh breakfast and genuine hospitality."
+    },
+    "scripts": [
+      {
+        "category": "1. Biscuit & Minis Pairing",
+        "trigger": "Guest orders Chicken Biscuit, Minis, or Spicy Biscuit",
+        "say": "Would you like to add crispy golden hash browns to that this morning?",
+        "tip_prefix": "Tip:",
+        "tip_text": "Hash browns take 1 tap to ring in and are hot and ready in the chute.",
+        "tip_quote": ""
+      },
+      {
+        "category": "2. Specialty Coffee Boost",
+        "trigger": "Guest asks for a soft drink, water, or hasn't picked a beverage",
+        "say": "Can I get you a vanilla cold brew iced coffee or hot specialty drip coffee today?",
+        "tip_prefix": "Tip:",
+        "tip_text": "Highlighting our cold brew coffee transforms standard transactions into high-loyalty morning visits.",
+        "tip_quote": "\"vanilla cold brew iced coffee\""
+      },
+      {
+        "category": "3. Scramble Bowl Upgrade",
+        "trigger": "Guest orders a Hash Brown Scramble Burrito or Bowl",
+        "say": "Would you like that with jalapeno salsa and a large fresh-squeezed orange juice?",
+        "tip_prefix": "Tip:",
+        "tip_text": "Proactively offering salsa and signature juice saves questions at the window.",
+        "tip_quote": ""
+      },
+      {
+        "category": "4. Morning Sweet Treat",
+        "trigger": "Guest ordering for colleagues or office breakfast run",
+        "say": "Can we treat the team to a 4-count or 10-count of warm Chick-n-Minis to share?",
+        "tip_prefix": "Tip:",
+        "tip_text": "Minis have high sharing appeal for office commuters.",
+        "tip_quote": ""
+      },
+      {
+        "category": "5. Meal Conversion",
+        "trigger": "Guest orders an Egg White Grill or Muffin only",
+        "say": "Would you like to make that a meal with hash browns and a fresh beverage?",
+        "tip_prefix": "Tip:",
+        "tip_text": "Converts single items into complete satisfying meals before they leave.",
+        "tip_quote": ""
+      },
+      {
+        "category": "6. Large Family / Carpool",
+        "trigger": "Multi-passenger car or mom/dad with kids in back",
+        "say": "Would you like to add an extra order of minis or a gallon of sweet tea for the morning commute?",
+        "tip_prefix": "Tip:",
+        "tip_text": "Anticipates hungry kids before the car pulls forward.",
+        "tip_quote": ""
+      }
+    ],
+    "cta": {
+      "yes": "\"Great choice! Your total is .45. Have a wonderful and productive morning!\"",
+      "no": "\"You got it! Your total is .10. Pull right forward, and it's our pleasure to serve you!\""
+    },
+    "rules": [
+      {
+        "num": "1",
+        "title": "Speed is Hospitality in the Morning",
+        "body": "Breakfast commuters value every single second. Make your suggestion brief, confident, and specific in under 3 seconds. If they decline, finalize immediately."
+      },
+      {
+        "num": "2",
+        "title": "Always Name the Crunch or the Caffeine",
+        "body": "Never ask \"Do you want a drink or side?\" Always say \"crispy hash browns\" or \"iced cold brew\". Specific craveable words trigger immediate mouth-watering decisions."
+      }
+    ],
+    "cadence": [
+      {
+        "week": "Week 1",
+        "focus": "Crispy Hash Brown Pairing",
+        "script": "\"Would you like to add crispy hash browns to that this morning?\"",
+        "metric": "+25% Hash brown volume",
+        "action": "Ensure hash brown chute is consistently stocked for zero wait time."
+      },
+      {
+        "week": "Week 2",
+        "focus": "Cold Brew & Specialty Coffee",
+        "script": "\"Can I get you a vanilla cold brew iced coffee to kick off your day?\"",
+        "metric": "+20% Iced coffee sales",
+        "action": "Train beverage team on 10-second cold brew prep standards."
+      },
+      {
+        "week": "Week 3",
+        "focus": "Chick-n-Minis Share Packs",
+        "script": "\"Can we add a 4-pack or 10-pack of warm minis to share?\"",
+        "metric": "+15% Minis unit mix",
+        "action": "Celebrate order takers with highest multi-pack morning additions."
+      },
+      {
+        "week": "Week 4",
+        "focus": "Throughput & Speed Challenge",
+        "script": "\"Would you like to make that a meal with hash browns and coffee?\"",
+        "metric": "< 20s Average IPOS order",
+        "action": "Time 10 consecutive morning orders; award fastest hospitality champion."
+      }
+    ],
+    "guardrails": {
+      "dos": [
+        "Keep orders moving: suggest immediately after the breakfast entr\u00e9e is tapped.",
+        "Pre-stage hash browns in warm chute so they are bagged within 5 seconds.",
+        "Offer iced cold brew proactively during warmer spring/fall mornings.",
+        "Maintain cheerful, upbeat morning energy with clear eye contact."
+      ],
+      "donts": [
+        "Don't hold up an order waiting for special condiments unless requested.",
+        "Don't pitch multiple items: 1 quick recommendation per car maximum.",
+        "Don't forget straws or coffee stoppers in the drink carrier.",
+        "Don't stall the line if an item has a short hold: park the car quickly."
+      ]
+    },
+    "scorecard": [
+      {
+        "title": "1. Morning Cheer",
+        "desc": "Warm, energized greeting that brightens the commuter's day."
+      },
+      {
+        "title": "2. Instant Suggestion",
+        "desc": "Named hash browns or coffee in under 3 seconds after entr\u00e9e."
+      },
+      {
+        "title": "3. Immediate Store",
+        "desc": "Order stored immediately upon answer to keep queue advancing."
+      },
+      {
+        "title": "4. Condiments Checked",
+        "desc": "Confirmed ketchup, jelly, or sauces before storing."
+      },
+      {
+        "title": "5. Speed Maintained",
+        "desc": "Transaction completed in under 20 seconds total."
+      }
+    ],
+    "footer": "Chick-fil-A Breakfast Operations \u2022 Continuous Speed & Hospitality Guide \u2022 Round Rock, TX"
+  }
+};
+
+    let currentData = JSON.parse(JSON.stringify(PRESETS['default']));
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem('cfa_initiative_guide_data');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed && parsed.header && parsed.scripts && parsed.scripts.length > 0) {
+            currentData = parsed;
+          }
+        } catch(e) {
+          console.warn("Could not load from localStorage", e);
+        }
+      }
+      populateForm();
+      renderPreview();
+    });
+
+    function persistData() {
+      localStorage.setItem('cfa_initiative_guide_data', JSON.stringify(currentData));
+    }
+
+    function toggleAccordion(header) {
+      const card = header.parentElement;
+      card.classList.toggle('closed');
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('formSidebar');
+      sidebar.classList.toggle('collapsed');
+      const isCollapsed = sidebar.classList.contains('collapsed');
+      document.getElementById('toggleIcon').textContent = isCollapsed ? '▶' : '◀';
+      document.getElementById('toggleText').textContent = isCollapsed ? 'Show Editor' : 'Hide Editor';
+    }
+
+    function loadSelectedPreset(presetKey) {
+      if (PRESETS[presetKey]) {
+        currentData = JSON.parse(JSON.stringify(PRESETS[presetKey]));
+        populateForm();
+        renderPreview();
+        persistData();
+      }
+    }
+
+    function updateField(path, value) {
+      const keys = path.split('.');
+      let target = currentData;
+      for (let i = 0; i < keys.length - 1; i++) {
+        target = target[keys[i]];
+      }
+      target[keys[keys.length - 1]] = value;
+      renderPreview();
+      persistData();
+    }
+
+    function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          currentData.header.image_src = evt.target.result;
+          document.getElementById('f_img_src').value = file.name;
+          renderPreview();
+          persistData();
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function updatePillarBullets(text) {
+      currentData.pillars.p2_bullets = text.split('\n').filter(line => line.trim().length > 0);
+      renderPreview();
+      persistData();
+    }
+
+    function updateGuardrails(type, text) {
+      currentData.guardrails[type] = text.split('\n').filter(line => line.trim().length > 0);
+      renderPreview();
+      persistData();
+    }
+
+    function populateForm() {
+      const d = currentData;
+      document.getElementById('f_eyebrow').value = d.header.eyebrow || '';
+      document.getElementById('f_title').value = d.header.title || '';
+      document.getElementById('f_subtitle').value = d.header.subtitle || '';
+      document.getElementById('f_img_src').value = d.header.image_src || '';
+      document.getElementById('f_m1_l').value = d.header.meta1_label || '';
+      document.getElementById('f_m1_v').value = d.header.meta1_val || '';
+      document.getElementById('f_m2_l').value = d.header.meta2_label || '';
+      document.getElementById('f_m2_v').value = d.header.meta2_val || '';
+      document.getElementById('f_m3_l').value = d.header.meta3_label || '';
+      document.getElementById('f_m3_v').value = d.header.meta3_val || '';
+      document.getElementById('f_m4_l').value = d.header.meta4_label || '';
+      document.getElementById('f_m4_v').value = d.header.meta4_val || '';
+
+      document.getElementById('f_h_tag').value = d.huddle.tag || '';
+      document.getElementById('f_h_meta').value = d.huddle.meta || '';
+      document.getElementById('f_h_title').value = d.huddle.title || '';
+      document.getElementById('f_h_goal').value = d.huddle.goal || '';
+      document.getElementById('f_h_why').value = d.huddle.why || '';
+      document.getElementById('f_h_focus').value = d.huddle.focus || '';
+
+      document.getElementById('f_p1_title').value = d.pillars.p1_title || '';
+      document.getElementById('f_p1_sub').value = d.pillars.p1_sub || '';
+      document.getElementById('f_p1_body').value = d.pillars.p1_body || '';
+      document.getElementById('f_p2_title').value = d.pillars.p2_title || '';
+      document.getElementById('f_p2_sub').value = d.pillars.p2_sub || '';
+      document.getElementById('f_p2_bullets').value = (d.pillars.p2_bullets || []).join('\n');
+      document.getElementById('f_p3_title').value = d.pillars.p3_title || '';
+      document.getElementById('f_p3_sub').value = d.pillars.p3_sub || '';
+      document.getElementById('f_p3_body').value = d.pillars.p3_body || '';
+
+      const sContainer = document.getElementById('scriptFormContainer');
+      sContainer.innerHTML = '';
+      (d.scripts || []).forEach((script, idx) => {
+        const box = document.createElement('div');
+        box.style.border = '1px solid #E5E7EB';
+        box.style.borderRadius = '4px';
+        box.style.padding = '8px';
+        box.style.marginBottom = '8px';
+        box.style.background = '#F9FAFB';
+        box.innerHTML = `
+          <div style="font-weight:700; font-size:0.72rem; color:#DD0031; margin-bottom:4px;">Card ${idx + 1}</div>
+          <div class="form-group" style="margin-bottom:6px;">
+            <input type="text" class="form-control" style="font-size:0.75rem;" placeholder="Category Pill" value="${escapeHtml(script.category)}" oninput="updateScriptField(${idx}, 'category', this.value)">
+          </div>
+          <div class="form-group" style="margin-bottom:6px;">
+            <input type="text" class="form-control" style="font-size:0.75rem;" placeholder="Order Trigger" value="${escapeHtml(script.trigger)}" oninput="updateScriptField(${idx}, 'trigger', this.value)">
+          </div>
+          <div class="form-group" style="margin-bottom:6px;">
+            <textarea class="form-control" style="font-size:0.75rem; min-height:40px;" placeholder="What to Say" oninput="updateScriptField(${idx}, 'say', this.value)">${escapeHtml(script.say)}</textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:4px;">
+            <input type="text" class="form-control" style="font-size:0.75rem;" placeholder="Tip Explanation" value="${escapeHtml(script.tip_text)}" oninput="updateScriptField(${idx}, 'tip_text', this.value)">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <input type="text" class="form-control" style="font-size:0.75rem; font-style:italic;" placeholder="Optional Highlight Quote Line" value="${escapeHtml(script.tip_quote || '')}" oninput="updateScriptField(${idx}, 'tip_quote', this.value)">
+          </div>
+        `;
+        sContainer.appendChild(box);
+      });
+
+      document.getElementById('f_cta_yes').value = d.cta.yes || '';
+      document.getElementById('f_cta_no').value = d.cta.no || '';
+
+      document.getElementById('f_r1_title').value = d.rules[0]?.title || '';
+      document.getElementById('f_r1_body').value = d.rules[0]?.body || '';
+      document.getElementById('f_r2_title').value = d.rules[1]?.title || '';
+      document.getElementById('f_r2_body').value = d.rules[1]?.body || '';
+
+      const cContainer = document.getElementById('cadenceFormContainer');
+      cContainer.innerHTML = '';
+      (d.cadence || []).forEach((row, idx) => {
+        const rBox = document.createElement('div');
+        rBox.style.border = '1px solid #E5E7EB';
+        rBox.style.borderRadius = '4px';
+        rBox.style.padding = '8px';
+        rBox.style.marginBottom = '8px';
+        rBox.style.background = '#F9FAFB';
+        rBox.innerHTML = `
+          <div style="font-weight:700; font-size:0.72rem; color:#DD0031; margin-bottom:4px;">Row ${idx + 1}</div>
+          <div class="form-row-2" style="margin-bottom:6px;">
+            <input type="text" class="form-control" style="font-size:0.75rem;" placeholder="Week/Date" value="${escapeHtml(row.week)}" oninput="updateCadenceField(${idx}, 'week', this.value)">
+            <input type="text" class="form-control" style="font-size:0.75rem;" placeholder="Primary Focus" value="${escapeHtml(row.focus)}" oninput="updateCadenceField(${idx}, 'focus', this.value)">
+          </div>
+          <div class="form-group" style="margin-bottom:6px;">
+            <input type="text" class="form-control" style="font-size:0.75rem;" placeholder="Featured Script" value="${escapeHtml(row.script)}" oninput="updateCadenceField(${idx}, 'script', this.value)">
+          </div>
+          <div class="form-row-2">
+            <input type="text" class="form-control" style="font-size:0.75rem;" placeholder="Target Metric" value="${escapeHtml(row.metric)}" oninput="updateCadenceField(${idx}, 'metric', this.value)">
+            <input type="text" class="form-control" style="font-size:0.75rem;" placeholder="Action" value="${escapeHtml(row.action)}" oninput="updateCadenceField(${idx}, 'action', this.value)">
+          </div>
+        `;
+        cContainer.appendChild(rBox);
+      });
+
+      document.getElementById('f_dos').value = (d.guardrails.dos || []).join('\n');
+      document.getElementById('f_donts').value = (d.guardrails.donts || []).join('\n');
+
+      const scContainer = document.getElementById('scorecardFormContainer');
+      scContainer.innerHTML = '';
+      (d.scorecard || []).forEach((item, idx) => {
+        const scBox = document.createElement('div');
+        scBox.style.marginBottom = '6px';
+        scBox.innerHTML = `
+          <div class="form-row-2">
+            <input type="text" class="form-control" style="font-size:0.75rem; font-weight:700;" placeholder="Title" value="${escapeHtml(item.title)}" oninput="updateScorecardField(${idx}, 'title', this.value)">
+            <input type="text" class="form-control" style="font-size:0.75rem;" placeholder="Description" value="${escapeHtml(item.desc)}" oninput="updateScorecardField(${idx}, 'desc', this.value)">
+          </div>
+        `;
+        scContainer.appendChild(scBox);
+      });
+
+      document.getElementById('f_footer').value = d.footer || '';
+    }
+
+    function updateScriptField(idx, field, val) {
+      currentData.scripts[idx][field] = val;
+      renderPreview();
+      persistData();
+    }
+
+    function updateCadenceField(idx, field, val) {
+      currentData.cadence[idx][field] = val;
+      renderPreview();
+      persistData();
+    }
+
+    function updateScorecardField(idx, field, val) {
+      currentData.scorecard[idx][field] = val;
+      renderPreview();
+      persistData();
+    }
+
+    function renderPreview() {
+      const d = currentData;
+
+      document.getElementById('p_hero_img').src = d.header.image_src || 'teammembers.jpg';
+      document.getElementById('p_eyebrow').textContent = d.header.eyebrow || '';
+      document.getElementById('p_title').textContent = d.header.title || '';
+      document.getElementById('p_subtitle').textContent = d.header.subtitle || '';
+      document.getElementById('p_m1_l').textContent = d.header.meta1_label || '';
+      document.getElementById('p_m1_v').textContent = d.header.meta1_val || '';
+      document.getElementById('p_m2_l').textContent = d.header.meta2_label || '';
+      document.getElementById('p_m2_v').textContent = d.header.meta2_val || '';
+      document.getElementById('p_m3_l').textContent = d.header.meta3_label || '';
+      document.getElementById('p_m3_v').textContent = d.header.meta3_val || '';
+      document.getElementById('p_m4_l').textContent = d.header.meta4_label || '';
+      document.getElementById('p_m4_v').textContent = d.header.meta4_val || '';
+
+      document.getElementById('p_h_tag').textContent = d.huddle.tag || 'Shift Huddle';
+      document.getElementById('p_h_title').textContent = d.huddle.title || '';
+      document.getElementById('p_h_meta').textContent = d.huddle.meta || '';
+      document.getElementById('p_h_goal').textContent = d.huddle.goal || '';
+      document.getElementById('p_h_why').textContent = d.huddle.why || '';
+      document.getElementById('p_h_focus').textContent = d.huddle.focus || '';
+
+      document.getElementById('p_p1_title').textContent = d.pillars.p1_title || '';
+      document.getElementById('p_p1_sub').textContent = d.pillars.p1_sub || '';
+      document.getElementById('p_p1_body').textContent = d.pillars.p1_body || '';
+      document.getElementById('p_p2_title').textContent = d.pillars.p2_title || '';
+      document.getElementById('p_p2_sub').textContent = d.pillars.p2_sub || '';
+
+      const p2Ul = document.getElementById('p_p2_bullets');
+      p2Ul.innerHTML = '';
+      (d.pillars.p2_bullets || []).forEach(bullet => {
+        const li = document.createElement('li');
+        if (bullet.includes(':')) {
+          const parts = bullet.split(':');
+          li.innerHTML = `<strong>${escapeHtml(parts[0])}:</strong>${escapeHtml(parts.slice(1).join(':'))}`;
+        } else {
+          li.textContent = bullet;
+        }
+        p2Ul.appendChild(li);
+      });
+
+      document.getElementById('p_p3_title').textContent = d.pillars.p3_title || '';
+      document.getElementById('p_p3_sub').textContent = d.pillars.p3_sub || '';
+      document.getElementById('p_p3_body').textContent = d.pillars.p3_body || '';
+
+      const scriptGrid = document.getElementById('p_script_grid');
+      scriptGrid.innerHTML = '';
+      (d.scripts || []).forEach((script) => {
+        const card = document.createElement('div');
+        card.className = 'script-card';
+
+        let quoteHtml = '';
+        if (script.tip_quote && script.tip_quote.trim().length > 0) {
+          quoteHtml = `<em>${escapeHtml(script.tip_quote)}</em>`;
+        }
+
+        card.innerHTML = `
+          <div>
+            <div class="script-badge-row">
+              <span class="script-category">${escapeHtml(script.category)}</span>
+            </div>
+            <div class="trigger-text"><strong>Order Trigger:</strong> ${escapeHtml(script.trigger)}</div>
+            <div class="say-bubble">"${escapeHtml(script.say.replace(/^"+|"+$/g, ''))}"</div>
+          </div>
+          <div class="coaching-tip">
+            <strong>${escapeHtml(script.tip_prefix || 'Tip:')}</strong> ${escapeHtml(script.tip_text)}
+            ${quoteHtml}
+          </div>
+        `;
+        scriptGrid.appendChild(card);
+      });
+
+      document.getElementById('p_cta_yes').textContent = d.cta.yes || '';
+      document.getElementById('p_cta_no').textContent = d.cta.no || '';
+
+      document.getElementById('p_r1_num').textContent = d.rules[0]?.num || '1';
+      document.getElementById('p_r1_title').textContent = d.rules[0]?.title || '';
+      document.getElementById('p_r1_body').textContent = d.rules[0]?.body || '';
+
+      document.getElementById('p_r2_num').textContent = d.rules[1]?.num || '2';
+      document.getElementById('p_r2_title').textContent = d.rules[1]?.title || '';
+      document.getElementById('p_r2_body').textContent = d.rules[1]?.body || '';
+
+      const cTbody = document.getElementById('p_cadence_tbody');
+      cTbody.innerHTML = '';
+      (d.cadence || []).forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><span class="week-badge">${escapeHtml(row.week)}</span></td>
+          <td><strong>${escapeHtml(row.focus)}</strong></td>
+          <td><em>"${escapeHtml(row.script.replace(/^"+|"+$/g, ''))}"</em></td>
+          <td><strong>${escapeHtml(row.metric)}:</strong> ${escapeHtml(row.action)}</td>
+        `;
+        cTbody.appendChild(tr);
+      });
+
+      const dosUl = document.getElementById('p_dos_list');
+      dosUl.innerHTML = '';
+      (d.guardrails.dos || []).forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        dosUl.appendChild(li);
+      });
+
+      const dontsUl = document.getElementById('p_donts_list');
+      dontsUl.innerHTML = '';
+      (d.guardrails.donts || []).forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        dontsUl.appendChild(li);
+      });
+
+      const scGrid = document.getElementById('p_scorecard_grid');
+      scGrid.innerHTML = '';
+      (d.scorecard || []).forEach(item => {
+        const sBox = document.createElement('div');
+        sBox.className = 'scorecard-item';
+        sBox.innerHTML = `
+          <strong>${escapeHtml(item.title)}</strong>
+          <span>${escapeHtml(item.desc)}</span>
+        `;
+        scGrid.appendChild(sBox);
+      });
+
+      const footText = d.footer || 'Chick-fil-A Operations • Initiative Guide';
+      document.getElementById('p_footer_p1').textContent = footText;
+      document.getElementById('p_footer_p2').textContent = footText;
+      document.getElementById('p_footer_p3').textContent = footText;
+    }
+
+    function resetToDefault() {
+      if (confirm('Reset all fields back to default? Any unsaved edits will be cleared.')) {
+        localStorage.removeItem('cfa_initiative_guide_data');
+        currentData = JSON.parse(JSON.stringify(PRESETS['default']));
+        document.getElementById('presetSelector').value = 'default';
+        populateForm();
+        renderPreview();
+      }
+    }
+
+    function exportDataJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", (currentData.header.title || "cfa_initiative_guide").replace(/\s+/g, '_') + ".json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importDataJSON(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const imported = JSON.parse(e.target.result);
+            currentData = imported;
+            populateForm();
+            renderPreview();
+            persistData();
+            alert("Initiative template loaded successfully!");
+          } catch(err) {
+            alert("Error parsing JSON file. Please make sure it is a valid CFA Initiative JSON.");
+          }
+        };
+        reader.readAsText(file);
+      }
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>

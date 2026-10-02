@@ -1,0 +1,3188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chick-fil-A Sector Focus Report Builder | Monthly, Quarterly &amp; Annual Diagnostics</title>
+  <style>
+    :root {
+      --cfa-red: #DD0031;
+      --cfa-red-dark: #AF272F;
+      --cfa-red-light: #FFF1F2;
+      --cfa-red-border: #FECDD3;
+      --cfa-navy: #004F71;
+      --cfa-navy-dark: #00364E;
+      --cfa-navy-light: #F0F7FA;
+      --cfa-charcoal: #5B6770;
+      --cfa-muted: #6B7280;
+      --cfa-bg: #F3F4F6;
+      --cfa-card-bg: #FFFFFF;
+      --cfa-border: #E5E7EB;
+      --cfa-gold: #D97706;
+      --cfa-gold-light: #FEF3C7;
+      --cfa-gold-border: #FDE68A;
+      --cfa-green: #16A34A;
+      --cfa-green-light: #F0FDF4;
+      --cfa-green-border: #BBF7D0;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--cfa-bg);
+      color: var(--cfa-navy);
+      line-height: 1.4;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Navigation Bar */
+    .app-topbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: #FFFFFF;
+      border-bottom: 2px solid var(--cfa-red);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .topbar-brand { display: flex; align-items: center; gap: 10px; }
+    .brand-badge {
+      background: var(--cfa-red);
+      color: #FFFFFF;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 9999px;
+    }
+    .brand-title { font-size: 1.05rem; font-weight: 800; color: var(--cfa-navy); }
+    .brand-subtitle { font-size: 0.76rem; color: var(--cfa-muted); margin-left: 4px; }
+    .topbar-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    .preset-select {
+      padding: 7px 12px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--cfa-navy);
+      background: #F9FAFB;
+      border: 1px solid #D1D5DB;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+
+    .btn {
+      padding: 7px 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn-secondary { background: #FFFFFF; color: var(--cfa-charcoal); border-color: #D1D5DB; }
+    .btn-secondary:hover { background: #F3F4F6; color: var(--cfa-navy); }
+    .btn-primary { background: var(--cfa-red); color: #FFFFFF; }
+    .btn-primary:hover { background: var(--cfa-red-dark); }
+    .btn-toggle-editor { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
+    .btn-toggle-editor:hover { background: #DBEAFE; }
+
+    /* App Workspace */
+    .app-workspace { display: flex; height: calc(100vh - 58px); overflow: hidden; }
+
+    .form-sidebar {
+      width: 490px;
+      flex-shrink: 0;
+      background: #FFFFFF;
+      border-right: 1px solid var(--cfa-border);
+      overflow-y: auto;
+      padding: 16px 20px 40px 20px;
+      transition: margin-left 0.25s ease;
+    }
+    .form-sidebar.collapsed { margin-left: -490px; }
+
+    .form-section-title {
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--cfa-red);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Accordion */
+    .accordion-card {
+      background: #FAFAFA;
+      border: 1px solid var(--cfa-border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .accordion-header {
+      background: #F3F4F6;
+      padding: 10px 14px;
+      font-size: 0.83rem;
+      font-weight: 700;
+      color: var(--cfa-navy);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+    }
+    .accordion-header:hover { background: #E5E7EB; }
+    .accordion-header::after { content: "▼"; font-size: 0.65rem; color: var(--cfa-muted); transition: transform 0.2s; }
+    .accordion-card.closed .accordion-header::after { transform: rotate(-90deg); }
+    .accordion-card.closed .accordion-body { display: none; }
+    .accordion-body { padding: 14px; background: #FFFFFF; }
+
+    /* Form Fields */
+    .form-group { margin-bottom: 12px; }
+    .form-group label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--cfa-charcoal);
+      margin-bottom: 4px;
+    }
+    .form-control {
+      width: 100%;
+      padding: 7px 10px;
+      font-size: 0.82rem;
+      color: var(--cfa-navy);
+      background: #FFFFFF;
+      border: 1px solid #D1D5DB;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--cfa-red);
+      box-shadow: 0 0 0 2px var(--cfa-red-light);
+    }
+    textarea.form-control { resize: vertical; min-height: 54px; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .image-picker-row { display: flex; align-items: center; gap: 10px; }
+    .file-input-btn {
+      font-size: 0.74rem;
+      padding: 6px 10px;
+      background: #F3F4F6;
+      border: 1px solid #D1D5DB;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* Preview Canvas */
+    .preview-canvas {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 24px;
+      background: #4B5563;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .preview-canvas-header {
+      width: 210mm;
+      max-width: 100%;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      color: #F3F4F6;
+      font-size: 0.78rem;
+    }
+
+    /* A4 Document Containers */
+    .a4-page {
+      width: 210mm;
+      min-height: 297mm;
+      background: #FFFFFF;
+      margin-bottom: 24px;
+      padding: 12mm 14mm;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-sizing: border-box;
+    }
+    .page-content { flex-grow: 1; }
+
+    .header-hero-wrap {
+      width: 100%;
+      height: 190px;
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      overflow: hidden;
+      position: relative;
+      background: #E5E7EB;
+    }
+    .header-hero-img { width: 100%; height: 100%; object-fit: cover; object-position: center 38%; display: block; }
+    .header-hero-wrap::after {
+      content: "";
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 60px;
+      background: linear-gradient(to bottom, rgba(221, 0, 49, 0) 0%, rgba(201, 17, 38, 0.75) 70%, var(--cfa-red) 100%);
+      pointer-events: none;
+    }
+
+    .guide-header {
+      background: linear-gradient(180deg, var(--cfa-red) 0%, var(--cfa-red-dark) 100%);
+      color: #FFFFFF;
+      border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+      padding: 16px 20px 18px 20px;
+      margin-bottom: 12px;
+    }
+    .header-eyebrow-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+    .header-eyebrow {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: rgba(255, 255, 255, 0.22);
+      padding: 3px 9px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .header-sector-badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: #FFFFFF;
+      color: var(--cfa-red);
+      padding: 3px 9px;
+      border-radius: 9999px;
+    }
+    .header-title-row h1 { font-size: 1.62rem; font-weight: 800; letter-spacing: -0.01em; line-height: 1.15; }
+    .header-title-row p.subtitle { font-size: 0.84rem; opacity: 0.95; margin-top: 4px; line-height: 1.3; }
+
+    .metadata-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.25);
+    }
+    .meta-item {
+      background: rgba(255, 255, 255, 0.12);
+      padding: 6px 8px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .meta-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; opacity: 0.85; }
+    .meta-value { font-size: 0.76rem; font-weight: 700; margin-top: 2px; line-height: 1.25; }
+
+    /* Executive Briefing / Strategic Thesis Banner */
+    .huddle-banner {
+      background: #2a3348;
+      color: #FFFFFF;
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      margin-bottom: 12px;
+    }
+    .huddle-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding-bottom: 5px;
+      margin-bottom: 8px;
+    }
+    .huddle-tag {
+      background: #c64242;
+      color: #FFFFFF;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+    .huddle-title { font-size: 0.90rem; font-weight: 800; color: #FFFFFF; }
+    .huddle-meta { font-size: 0.70rem; color: #dbe2ee; }
+    .huddle-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .huddle-cell h5 { font-size: 0.64rem; text-transform: uppercase; color: #F87171; margin-bottom: 2px; font-weight: 800; }
+    .huddle-cell p { font-size: 0.75rem; color: #F3F4F6; line-height: 1.3; }
+
+    /* Section Card */
+    .section-card {
+      background: #FFFFFF;
+      border-radius: var(--radius-sm);
+      border: 1px solid #D1D5DB;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--cfa-red-light);
+    }
+    .section-header h2 { font-size: 0.95rem; font-weight: 800; color: var(--cfa-red); text-transform: uppercase; }
+    .section-icon-wrap {
+      width: 26px; height: 26px;
+      background: var(--cfa-red-light);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .cfa-icon { width: 16px; height: 16px; }
+
+    /* KPI Tiles Grid */
+    .kpi-tiles-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .kpi-tile {
+      background: #FFFFFF;
+      border: 1px solid #D1D5DB;
+      border-top: 3px solid var(--cfa-navy);
+      border-radius: var(--radius-sm);
+      padding: 8px 9px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .kpi-tile.ahead { border-top-color: var(--cfa-green); }
+    .kpi-tile.warning { border-top-color: var(--cfa-red); }
+    .kpi-tile.ontrack { border-top-color: var(--cfa-navy); }
+    .kpi-tile-header { font-size: 0.65rem; font-weight: 700; color: var(--cfa-muted); text-transform: uppercase; line-height: 1.2; margin-bottom: 4px; }
+    .kpi-tile-val { font-size: 1.15rem; font-weight: 800; color: var(--cfa-navy); line-height: 1.1; margin-bottom: 4px; }
+    .kpi-sub-row { font-size: 0.62rem; color: var(--cfa-charcoal); line-height: 1.25; margin-bottom: 4px; }
+    .kpi-variance-pill {
+      display: inline-block;
+      font-size: 0.60rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      align-self: flex-start;
+    }
+    .kpi-variance-pill.ahead { background: var(--cfa-green-light); color: var(--cfa-green); border: 1px solid var(--cfa-green-border); }
+    .kpi-variance-pill.warning { background: var(--cfa-red-light); color: var(--cfa-red); border: 1px solid var(--cfa-red-border); }
+    .kpi-variance-pill.ontrack { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+
+    /* Three Pillar Grid */
+    .three-pillar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .pillar-box {
+      background: #FAFAFA;
+      border: 1px solid #D1D5DB;
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      border-top: 3px solid var(--cfa-red);
+    }
+    .pillar-box h3 { font-size: 0.76rem; font-weight: 800; color: var(--cfa-red); text-transform: uppercase; margin-bottom: 2px; }
+    .pillar-subtitle { font-size: 0.68rem; font-style: italic; color: var(--cfa-muted); margin-bottom: 4px; }
+    .pillar-box p, .pillar-box ul { font-size: 0.74rem; color: var(--cfa-charcoal); line-height: 1.3; }
+    .pillar-box ul { list-style-type: none; }
+    .pillar-box ul li { position: relative; padding-left: 12px; margin-bottom: 3px; }
+    .pillar-box ul li::before { content: "•"; position: absolute; left: 2px; color: var(--cfa-red); font-weight: bold; }
+
+    /* Matrix Table */
+    table.matrix-table { width: 100%; border-collapse: collapse; font-size: 0.71rem; border: 1px solid #D1D5DB; }
+    table.matrix-table th {
+      background: #F3F4F6; color: var(--cfa-navy); font-weight: 700;
+      padding: 6px 8px; border: 1px solid #D1D5DB; text-transform: uppercase; font-size: 0.62rem;
+    }
+    table.matrix-table td { padding: 6px 8px; border: 1px solid #E5E7EB; vertical-align: top; color: var(--cfa-charcoal); line-height: 1.25; }
+    .segment-badge { font-weight: 800; color: var(--cfa-navy); }
+    .matrix-var.pos { color: var(--cfa-green); font-weight: 700; }
+    .matrix-var.neg { color: var(--cfa-red); font-weight: 700; }
+
+    /* Tactics Grid */
+    .tactics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .tactic-card {
+      border: 1px solid #D1D5DB;
+      border-radius: var(--radius-sm);
+      background: #FFFFFF;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .tactic-badge-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .tactic-category {
+      font-size: 0.62rem;
+      font-weight: 800;
+      color: var(--cfa-red);
+      background: var(--cfa-red-light);
+      border: 1px solid var(--cfa-red-border);
+      padding: 2px 7px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+    }
+    .trigger-text { font-size: 0.7rem; color: var(--cfa-muted); line-height: 1.25; margin-bottom: 4px; }
+    .trigger-text strong { color: var(--cfa-navy); }
+
+    .action-bubble {
+      background: #FFF1F2;
+      border: 1px solid #FECDD3;
+      border-left: 4px solid var(--cfa-red);
+      border-radius: 4px;
+      padding: 6px 10px;
+      margin: 5px 0;
+      font-size: 0.76rem;
+      color: #990022;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .tactic-footer-info {
+      font-size: 0.68rem;
+      color: var(--cfa-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 4px;
+      border-top: 1px dashed #E5E7EB;
+      padding-top: 4px;
+    }
+    .tactic-footer-info strong { color: var(--cfa-navy); }
+
+    /* Leadership Protocol Box */
+    .cta-box {
+      background: #FFF7ED;
+      border: 1px solid #FED7AA;
+      border-left: 4px solid var(--cfa-gold);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      margin-top: 8px;
+    }
+    .cta-box h4 { font-size: 0.72rem; font-weight: 800; color: var(--cfa-gold); text-transform: uppercase; margin-bottom: 4px; }
+    .cta-dialogues { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .cta-dialogue-item { font-size: 0.72rem; color: var(--cfa-charcoal); line-height: 1.3; }
+    .cta-dialogue-item strong { display: block; font-size: 0.62rem; text-transform: uppercase; color: var(--cfa-navy); margin-bottom: 2px; }
+
+    /* Cadence Table */
+    table.cadence-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; border: 1px solid #D1D5DB; }
+    table.cadence-table th {
+      background: #F3F4F6; color: var(--cfa-navy); font-weight: 700;
+      padding: 5px 8px; border: 1px solid #D1D5DB; text-transform: uppercase; font-size: 0.62rem;
+    }
+    table.cadence-table td { padding: 5px 8px; border: 1px solid #E5E7EB; vertical-align: top; color: var(--cfa-charcoal); line-height: 1.25; }
+    .week-badge { font-weight: 800; color: var(--cfa-red); }
+
+    /* Dodont Grid */
+    .dodont-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .dodont-card { border-radius: var(--radius-sm); padding: 8px 10px; }
+    .dodont-card.do { background: var(--cfa-green-light); border: 1px solid #86EFAC; border-top: 3px solid var(--cfa-green); }
+    .dodont-card.dont { background: #FEF2F2; border: 1px solid #FECDD3; border-top: 3px solid #DC2626; }
+    .dodont-header { font-size: 0.74rem; font-weight: 800; margin-bottom: 5px; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+    .dodont-card.do .dodont-header { color: var(--cfa-green); }
+    .dodont-card.dont .dodont-header { color: var(--cfa-red); }
+    .dodont-list { list-style-type: none; }
+    .dodont-list li { font-size: 0.7rem; margin-bottom: 4px; line-height: 1.3; color: var(--cfa-navy); padding-left: 14px; position: relative; }
+    .dodont-card.do .dodont-list li::before { content: "✓"; position: absolute; left: 0; color: var(--cfa-green); font-weight: bold; }
+    .dodont-card.dont .dodont-list li::before { content: "✕"; position: absolute; left: 0; color: var(--cfa-red); font-weight: bold; }
+
+    /* Scorecard Grid */
+    .scorecard-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .scorecard-item {
+      border: 1px solid #D1D5DB; border-top: 2px solid var(--cfa-red);
+      border-radius: var(--radius-sm); padding: 5px 7px; background: #FAFAFA;
+    }
+    .scorecard-item strong { display: block; font-size: 0.68rem; color: var(--cfa-navy); margin-bottom: 2px; }
+    .scorecard-item span { font-size: 0.62rem; color: var(--cfa-muted); line-height: 1.25; display: block; }
+
+    /* Executive Signoff Card */
+    .signoff-card {
+      background: #F9FAFB;
+      border: 1px solid #D1D5DB;
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      margin-top: 8px;
+    }
+    .signoff-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .signoff-item h6 { font-size: 0.60rem; text-transform: uppercase; color: var(--cfa-muted); margin-bottom: 2px; }
+    .signoff-item p { font-size: 0.74rem; font-weight: 700; color: var(--cfa-navy); }
+    .signoff-item small { font-size: 0.65rem; color: var(--cfa-charcoal); }
+
+    /* Document Footer */
+    .a4-footer {
+      border-top: 1px solid #D1D5DB;
+      padding-top: 6px; margin-top: 6px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.65rem; color: var(--cfa-muted);
+    }
+    .a4-footer .page-number { font-weight: 700; color: var(--cfa-navy); }
+
+    /* =========================================================
+       CALIBRATED 3-PAGE A4 PRINT & PDF STYLESHEET
+       ========================================================= */
+    @page {
+      size: A4 portrait;
+      margin: 10mm 12mm;
+    }
+
+    @media print {
+      *, *::before, *::after {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+        text-rendering: geometricPrecision !important;
+        box-sizing: border-box !important;
+      }
+
+      body {
+        background: #FFFFFF !important;
+        color: #1F2937 !important;
+        font-size: 8pt !important;
+        line-height: 1.3 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      .app-topbar,
+      .form-sidebar,
+      .preview-canvas-header,
+      .print-btn,
+      .no-print {
+        display: none !important;
+      }
+
+      .app-workspace {
+        display: block !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+
+      .preview-canvas {
+        background: none !important;
+        padding: 0 !important;
+        display: block !important;
+        overflow: visible !important;
+      }
+
+      .a4-page {
+        width: 100% !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        min-height: auto !important;
+      }
+
+      /* Exact 3-Page Splits */
+      #page-2 {
+        page-break-before: always !important;
+        break-before: page !important;
+        margin-top: 0 !important;
+      }
+
+      #page-3 {
+        page-break-before: always !important;
+        break-before: page !important;
+        margin-top: 0 !important;
+      }
+
+      .tactic-card,
+      .pillar-box,
+      .kpi-tile,
+      .dodont-card,
+      .scorecard-item,
+      .signoff-card,
+      tr {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      .header-hero-wrap {
+        height: 160px !important;
+        border-radius: 6px 6px 0 0 !important;
+        margin: 0 !important;
+      }
+
+      .header-hero-wrap::after { display: none !important; }
+
+      .guide-header {
+        background: #DD0031 !important;
+        border-radius: 0 0 6px 6px !important;
+        padding: 10px 14px 12px 14px !important;
+        margin-bottom: 6px !important;
+        box-shadow: none !important;
+        overflow: visible !important;
+      }
+
+      .guide-header::after { display: none !important; }
+
+      .header-eyebrow {
+        background: #BE002A !important;
+        border: 1px solid #E23D5B !important;
+        color: #FFFFFF !important;
+        opacity: 1 !important;
+      }
+
+      .header-title-row h1 {
+        color: #FFFFFF !important;
+        font-size: 1.22rem !important;
+        line-height: 1.15 !important;
+      }
+
+      .header-title-row p.subtitle {
+        color: #FFFFFF !important;
+        opacity: 1 !important;
+        font-size: 0.70rem !important;
+        line-height: 1.2 !important;
+      }
+
+      .metadata-grid {
+        border-top: 1px solid #E23D5B !important;
+        gap: 6px !important;
+        margin-top: 6px !important;
+        padding-top: 5px !important;
+      }
+
+      .meta-item {
+        background: #BE002A !important;
+        border: 1px solid #E23D5B !important;
+        opacity: 1 !important;
+        padding: 3px 6px !important;
+      }
+
+      .meta-label { color: #FEE2E2 !important; opacity: 1 !important; }
+      .meta-value { color: #FFFFFF !important; opacity: 1 !important; }
+
+      .huddle-banner {
+        background: #2a3348 !important;
+        padding: 6px 10px !important;
+        margin-bottom: 6px !important;
+      }
+
+      .section-card {
+        padding: 6px 10px !important;
+        margin-bottom: 6px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================
+       APP TOP BAR (CONTROLS & ACTIONS)
+       ========================================== -->
+  <header class="app-topbar no-print">
+    <div class="topbar-brand">
+      <span class="brand-badge">Chick-fil-A</span>
+      <span class="brand-title">Sector Focus Report Builder</span>
+      <span class="brand-subtitle">• Monthly, Quarterly &amp; Annual Diagnostics</span>
+    </div>
+
+    <div class="topbar-actions">
+      <!-- Preset Dropdown -->
+      <select id="presetSelector" class="preset-select" onchange="loadSelectedPreset(this.value)">
+        <option value="sales">📈 Sales Sector: Drive-Thru Revenue &amp; Daypart Optimization (Quarterly)</option>
+        <option value="profit">💰 Profit &amp; Food Cost: Kitchen Waste &amp; Yield Containment (Monthly)</option>
+        <option value="talent">👥 Talent &amp; Culture: 90-Day Retention &amp; Leader Pipeline (Quarterly)</option>
+        <option value="speed">⏱️ Speed of Service: Drive-Thru SOS &amp; Lane Throughput (Monthly)</option>
+        <option value="catering">📦 Outside Sales &amp; Catering: Corporate B2B Growth (Annual)</option>
+      </select>
+
+      <!-- Toggle Editor Panel -->
+      <button class="btn btn-toggle-editor" onclick="toggleSidebar()">
+        <span id="toggleIcon">◀</span> <span id="toggleText">Hide Editor</span>
+      </button>
+
+      <!-- Reset Defaults -->
+      <button class="btn btn-secondary" onclick="resetToDefault()" title="Reset current report back to template default">
+        ↺ Reset
+      </button>
+
+      <!-- Save & Load Template -->
+      <button class="btn btn-secondary" onclick="exportDataJSON()" title="Save your report as a JSON file">
+        💾 Export JSON
+      </button>
+
+      <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()" title="Load a saved report JSON">
+        📂 Import JSON
+      </button>
+      <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importDataJSON(event)">
+
+      <!-- Print / Export PDF -->
+      <button class="btn btn-primary" onclick="window.print()">
+        🖨️ Print / Save PDF
+      </button>
+    </div>
+  </header>
+
+  <!-- ==========================================
+       MAIN APP WORKSPACE
+       ========================================== -->
+  <div class="app-workspace">
+
+    <!-- LEFT SIDE: FORM EDITOR PANEL -->
+    <aside class="form-sidebar" id="formSidebar">
+      <div class="form-section-title">
+        <span>✏️</span> Sector Diagnostic Editor
+      </div>
+
+      <!-- ACCORDION 1: HEADER & PROGRAM METADATA -->
+      <div class="accordion-card">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          1. Header, Cadence &amp; Sector Scope
+        </div>
+        <div class="accordion-body">
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Timeframe Cadence</label>
+              <input type="text" id="f_cadence_tag" class="form-control" placeholder="e.g. Monthly Focus / Quarterly Review" oninput="updateField('header.timeframe_type', this.value)">
+            </div>
+            <div class="form-group">
+              <label>Sector Focus Name</label>
+              <input type="text" id="f_sector_name" class="form-control" placeholder="e.g. Sales / Food Cost / Talent" oninput="updateField('header.sector', this.value)">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Report Title</label>
+            <input type="text" id="f_title" class="form-control" oninput="updateField('header.title', this.value)">
+          </div>
+          <div class="form-group">
+            <label>Strategic Diagnostic Subtitle</label>
+            <textarea id="f_subtitle" class="form-control" oninput="updateField('header.subtitle', this.value)"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Banner Image</label>
+            <div class="image-picker-row">
+              <input type="text" id="f_img_src" class="form-control" placeholder="teammembers.jpg or URL" oninput="updateField('header.image_src', this.value)">
+              <label class="file-input-btn">
+                Browse...
+                <input type="file" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
+              </label>
+            </div>
+            <span style="font-size:0.65rem; color:#6B7280;">Upload local image or provide filename/URL.</span>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Meta 1 Label</label>
+              <input type="text" id="f_m1_l" class="form-control" oninput="updateField('header.meta1_label', this.value)">
+            </div>
+            <div class="form-group">
+              <label>Meta 1 Value (Location)</label>
+              <input type="text" id="f_m1_v" class="form-control" oninput="updateField('header.meta1_val', this.value)">
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Meta 2 Label</label>
+              <input type="text" id="f_m2_l" class="form-control" oninput="updateField('header.meta2_label', this.value)">
+            </div>
+            <div class="form-group">
+              <label>Meta 2 Value (Period)</label>
+              <input type="text" id="f_m2_v" class="form-control" oninput="updateField('header.meta2_val', this.value)">
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Meta 3 Label</label>
+              <input type="text" id="f_m3_l" class="form-control" oninput="updateField('header.meta3_label', this.value)">
+            </div>
+            <div class="form-group">
+              <label>Meta 3 Value (Author)</label>
+              <input type="text" id="f_m3_v" class="form-control" oninput="updateField('header.meta3_val', this.value)">
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Meta 4 Label</label>
+              <input type="text" id="f_m4_l" class="form-control" oninput="updateField('header.meta4_label', this.value)">
+            </div>
+            <div class="form-group">
+              <label>Meta 4 Value (Date)</label>
+              <input type="text" id="f_m4_v" class="form-control" oninput="updateField('header.meta4_val', this.value)">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCORDION 2: EXECUTIVE BRIEFING -->
+      <div class="accordion-card closed">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          2. Executive Strategic Briefing
+        </div>
+        <div class="accordion-body">
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Briefing Tag</label>
+              <input type="text" id="f_b_tag" class="form-control" oninput="updateField('briefing.tag', this.value)">
+            </div>
+            <div class="form-group">
+              <label>Review Context</label>
+              <input type="text" id="f_b_meta" class="form-control" oninput="updateField('briefing.meta', this.value)">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Briefing Headline</label>
+            <input type="text" id="f_b_title" class="form-control" oninput="updateField('briefing.title', this.value)">
+          </div>
+          <div class="form-group">
+            <label>Primary Benchmark Goal</label>
+            <textarea id="f_b_goal" class="form-control" oninput="updateField('briefing.goal', this.value)"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Root Cause Diagnostic (Why it happened)</label>
+            <textarea id="f_b_why" class="form-control" oninput="updateField('briefing.why', this.value)"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Critical Strategic Priority</label>
+            <textarea id="f_b_focus" class="form-control" oninput="updateField('briefing.focus', this.value)"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCORDION 3: CORE KPI TILES -->
+      <div class="accordion-card closed">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          3. Core Sector KPI Scorecard (Tiles)
+        </div>
+        <div class="accordion-body">
+          <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
+            <button class="btn btn-secondary" style="font-size:0.72rem; padding:4px 8px;" onclick="addKpiTile()">+ Add KPI Tile</button>
+          </div>
+          <div id="kpiFormContainer"></div>
+        </div>
+      </div>
+
+      <!-- ACCORDION 4: THREE-PILLAR DIAGNOSTIC -->
+      <div class="accordion-card closed">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          4. Section 1 (Three-Pillar Diagnostic)
+        </div>
+        <div class="accordion-body">
+          <div style="font-weight:700; font-size:0.75rem; color:#DD0031; margin-bottom:6px;">Pillar 1: What Worked / Positive Catalysts</div>
+          <div class="form-row-2">
+            <input type="text" id="f_p1_title" class="form-control" placeholder="Title" oninput="updateField('pillars.p1_title', this.value)">
+            <input type="text" id="f_p1_sub" class="form-control" placeholder="Subtitle" oninput="updateField('pillars.p1_sub', this.value)">
+          </div>
+          <div class="form-group" style="margin-top:6px;">
+            <textarea id="f_p1_body" class="form-control" oninput="updateField('pillars.p1_body', this.value)"></textarea>
+          </div>
+
+          <div style="font-weight:700; font-size:0.75rem; color:#DD0031; margin:12px 0 6px 0;">Pillar 2: Vulnerabilities &amp; Friction Points (Bullets)</div>
+          <div class="form-row-2">
+            <input type="text" id="f_p2_title" class="form-control" placeholder="Title" oninput="updateField('pillars.p2_title', this.value)">
+            <input type="text" id="f_p2_sub" class="form-control" placeholder="Subtitle" oninput="updateField('pillars.p2_sub', this.value)">
+          </div>
+          <div class="form-group" style="margin-top:6px;">
+            <label style="font-size:0.65rem;">Bullets (1 per line)</label>
+            <textarea id="f_p2_bullets" class="form-control" style="min-height:75px;" oninput="updatePillarBullets(this.value)"></textarea>
+          </div>
+
+          <div style="font-weight:700; font-size:0.75rem; color:#DD0031; margin:12px 0 6px 0;">Pillar 3: High-Leverage Strategic Lever</div>
+          <div class="form-row-2">
+            <input type="text" id="f_p3_title" class="form-control" placeholder="Title" oninput="updateField('pillars.p3_title', this.value)">
+            <input type="text" id="f_p3_sub" class="form-control" placeholder="Subtitle" oninput="updateField('pillars.p3_sub', this.value)">
+          </div>
+          <div class="form-group" style="margin-top:6px;">
+            <textarea id="f_p3_body" class="form-control" oninput="updateField('pillars.p3_body', this.value)"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCORDION 5: GRANULAR BREAKDOWN MATRIX -->
+      <div class="accordion-card closed">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          5. Section 2 (Granular Breakdown Matrix)
+        </div>
+        <div class="accordion-body">
+          <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
+            <button class="btn btn-secondary" style="font-size:0.72rem; padding:4px 8px;" onclick="addMatrixRow()">+ Add Matrix Row</button>
+          </div>
+          <div id="matrixFormContainer"></div>
+        </div>
+      </div>
+
+      <!-- ACCORDION 6: TACTICAL INTERVENTIONS & PROTOCOLS -->
+      <div class="accordion-card closed">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          6. Section 3 (Tactical Intervention Playbook)
+        </div>
+        <div class="accordion-body">
+          <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
+            <button class="btn btn-secondary" style="font-size:0.72rem; padding:4px 8px;" onclick="addTacticCard()">+ Add Intervention Card</button>
+          </div>
+          <div id="tacticsFormContainer"></div>
+
+          <div style="font-weight:700; font-size:0.75rem; color:#D97706; margin:12px 0 6px 0;">Leadership Coaching Protocols</div>
+          <div class="form-group">
+            <label>When Reinforcing Wins (How Leaders Celebrate)</label>
+            <textarea id="f_proto_reinforce" class="form-control" oninput="updateField('closing_protocols.reinforce', this.value)"></textarea>
+          </div>
+          <div class="form-group">
+            <label>When Correcting Drift (How Leaders Course-Correct)</label>
+            <textarea id="f_proto_correct" class="form-control" oninput="updateField('closing_protocols.correct', this.value)"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCORDION 7: EXECUTION ROADMAP -->
+      <div class="accordion-card closed">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          7. Section 4 (Execution &amp; Milestone Cadence)
+        </div>
+        <div class="accordion-body">
+          <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
+            <button class="btn btn-secondary" style="font-size:0.72rem; padding:4px 8px;" onclick="addCadenceRow()">+ Add Milestone Row</button>
+          </div>
+          <div id="cadenceFormContainer"></div>
+        </div>
+      </div>
+
+      <!-- ACCORDION 8: OPERATIONAL GUARDRAILS -->
+      <div class="accordion-card closed">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          8. Section 5 (Operational Guardrails)
+        </div>
+        <div class="accordion-body">
+          <div class="form-group">
+            <label style="color:var(--cfa-green);">Disciplines To Enforce (1 per line)</label>
+            <textarea id="f_dos" class="form-control" style="min-height:90px;" oninput="updateGuardrails('dos', this.value)"></textarea>
+          </div>
+          <div class="form-group">
+            <label style="color:var(--cfa-red);">Behaviors To Eliminate / Avoid (1 per line)</label>
+            <textarea id="f_donts" class="form-control" style="min-height:90px;" oninput="updateGuardrails('donts', this.value)"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCORDION 9: SCORECARD & EXECUTIVE SIGNOFF -->
+      <div class="accordion-card closed">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          9. Section 6 (Audit Checklist &amp; Sign-Off)
+        </div>
+        <div class="accordion-body">
+          <div id="scorecardFormContainer">
+            <!-- Dynamically populated 5 items -->
+          </div>
+
+          <div style="font-weight:700; font-size:0.75rem; color:#DD0031; margin:12px 0 6px 0;">Executive Sign-Off &amp; Schedule</div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Sector Lead Name</label>
+              <input type="text" id="f_so_sponsor" class="form-control" oninput="updateField('signoff.sponsor', this.value)">
+            </div>
+            <div class="form-group">
+              <label>Sector Lead Title</label>
+              <input type="text" id="f_so_sp_role" class="form-control" oninput="updateField('signoff.sponsor_role', this.value)">
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Operator / GM Name</label>
+              <input type="text" id="f_so_operator" class="form-control" oninput="updateField('signoff.operator', this.value)">
+            </div>
+            <div class="form-group">
+              <label>Operator Role</label>
+              <input type="text" id="f_so_op_role" class="form-control" oninput="updateField('signoff.operator_role', this.value)">
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Next Review Date</label>
+              <input type="text" id="f_so_review" class="form-control" oninput="updateField('signoff.next_review', this.value)">
+            </div>
+            <div class="form-group">
+              <label>Milestone Status</label>
+              <input type="text" id="f_so_status" class="form-control" oninput="updateField('signoff.milestone_status', this.value)">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top:10px;">
+            <label>Document Footer Text</label>
+            <input type="text" id="f_footer" class="form-control" oninput="updateField('footer', this.value)">
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- RIGHT SIDE: LIVE A4 PREVIEW CANVAS -->
+    <main class="preview-canvas">
+      
+      <div class="preview-canvas-header no-print">
+        <span>📄 Live Diagnostic Report (3-Page Calibrated A4 Layout)</span>
+        <span>Automatic Real-Time Sync</span>
+      </div>
+
+      <!-- ==========================================
+           A4 PAGE 1: HEADER + BRIEFING + SCORECARD + SECTION 1
+           ========================================== -->
+      <div class="a4-page" id="page-1">
+        <div class="page-content">
+
+          <!-- Unified Card Top: Hero Image -->
+          <div class="header-hero-wrap">
+            <img id="p_hero_img" src="teammembers.jpg" alt="Chick-fil-A Operations" class="header-hero-img">
+          </div>
+
+          <!-- Unified Card Bottom: Header Info -->
+          <header class="guide-header">
+            <div class="header-eyebrow-row">
+              <span id="p_cadence_tag" class="header-eyebrow">Quarterly Sector Review</span>
+              <span id="p_sector_name" class="header-sector-badge">Sales &amp; Daypart Optimization</span>
+            </div>
+            <div class="header-title-row">
+              <div>
+                <h1 id="p_title">Drive-Thru Sales &amp; Daypart Revenue Optimization</h1>
+                <p id="p_subtitle" class="subtitle">A granular diagnostic report analyzing drive-thru sales mix, peak daypart capacity constraints, and high-margin attachment opportunities.</p>
+              </div>
+            </div>
+
+            <div class="metadata-grid">
+              <div class="meta-item">
+                <div id="p_m1_l" class="meta-label">Store Location</div>
+                <div id="p_m1_v" class="meta-value">Chick-fil-A Round Rock • Store #03241</div>
+              </div>
+              <div class="meta-item">
+                <div id="p_m2_l" class="meta-label">Reporting Period</div>
+                <div id="p_m2_v" class="meta-value">Q3 2026 (July – September)</div>
+              </div>
+              <div class="meta-item">
+                <div id="p_m3_l" class="meta-label">Sector Lead</div>
+                <div id="p_m3_v" class="meta-value">Marcus Vance, Director of Operations</div>
+              </div>
+              <div class="meta-item">
+                <div id="p_m4_l" class="meta-label">Review Date</div>
+                <div id="p_m4_v" class="meta-value">October 1, 2026</div>
+              </div>
+            </div>
+          </header>
+
+          <!-- Executive Diagnostic Briefing Banner -->
+          <section class="huddle-banner">
+            <div class="huddle-header">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span id="p_b_tag" class="huddle-tag">Executive Briefing</span>
+                <span id="p_b_title" class="huddle-title">Q3 Drive-Thru Revenue Trajectory &amp; Capacity Unlocks</span>
+              </div>
+              <span id="p_b_meta" class="huddle-meta">Presented at Executive Leadership Quarterly Review</span>
+            </div>
+            <div class="huddle-grid">
+              <div class="huddle-cell">
+                <h5>Primary Benchmark Goal</h5>
+                <p id="p_b_goal">Surpass $1.8M quarterly drive-thru volume while maintaining sub-2:00 average Speed of Service.</p>
+              </div>
+              <div class="huddle-cell">
+                <h5>Root Cause Diagnostic</h5>
+                <p id="p_b_why">Lunch peak has achieved physical capacity (192 cars/hr). Further revenue growth requires accelerating afternoon lull mix (+22%) and breakfast beverage attachment.</p>
+              </div>
+              <div class="huddle-cell">
+                <h5>Critical Strategic Priority</h5>
+                <p id="p_b_focus">Deploy dedicated outside order takers (IPOS) with structured beverage suggestive prompts during the 1:30–4:30 PM lull.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Core Sector KPI Scorecard (5 Tiles) -->
+          <div class="kpi-tiles-grid" id="p_kpi_grid">
+            <!-- Dynamically populated 5 tiles -->
+          </div>
+
+          <!-- Section 1: Three-Pillar Diagnostic Analysis -->
+          <section class="section-card">
+            <div class="section-header">
+              <div class="section-icon-wrap">
+                <svg class="cfa-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M24 40S8 29 8 18C8 12 13 8 18 8C21 8 23 10 24 12C25 10 27 8 30 8C35 8 40 12 40 18C40 29 24 40 24 40Z" stroke="#DD0031" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M19 22C20 25 24 26 28 23" stroke="#DD0031" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h2>Section 1: Sector Diagnostic &amp; Root Cause Analysis</h2>
+            </div>
+
+            <div class="three-pillar-grid">
+              <div class="pillar-box">
+                <h3 id="p_p1_title">1. Positive Drivers &amp; Catalysts</h3>
+                <div id="p_p1_sub" class="pillar-subtitle">Where momentum originated this quarter</div>
+                <p id="p_p1_body">Dinner drive-thru volume surged +12.4% YoY driven by family 30-count nugget meal bundles and delivery integration. Breakfast drive-thru gained +9.1% with hash brown bowl pairings and mobile order curbside transitions.</p>
+              </div>
+
+              <div class="pillar-box">
+                <h3 id="p_p2_title">2. Friction Points &amp; Leakage</h3>
+                <div id="p_p2_sub" class="pillar-subtitle">Specific bottlenecks hindering maximum yield</div>
+                <ul id="p_p2_bullets">
+                  <!-- Dynamically populated bullets -->
+                </ul>
+              </div>
+
+              <div class="pillar-box">
+                <h3 id="p_p3_title">3. High-Leverage Strategic Lever</h3>
+                <div id="p_p3_sub" class="pillar-subtitle">The targeted intervention to close the gap</div>
+                <p id="p_p3_body">Executing a targeted 'Afternoon Crave &amp; Treat' initiative supported by paired IPOS order-taking scripts, mobile dessert pre-staging, and dedicated drink fulfillment during afternoon shifts.</p>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <footer class="a4-footer">
+          <span id="p_footer_p1">Chick-fil-A Executive Operations • Sector Focus Diagnostic</span>
+          <span class="page-number">Page 1 of 3 • Executive Diagnostic &amp; Sector Scorecard</span>
+        </footer>
+      </div>
+
+      <!-- ==========================================
+           A4 PAGE 2: GRANULAR BREAKDOWN & TACTICAL INTERVENTIONS
+           ========================================== -->
+      <div class="a4-page" id="page-2">
+        <div class="page-content">
+
+          <!-- Section 2: Detailed Sector Breakdown Matrix -->
+          <section class="section-card" id="p-sec2">
+            <div class="section-header">
+              <div class="section-icon-wrap">
+                <svg class="cfa-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="8" y="10" width="32" height="28" rx="3" stroke="#DD0031" stroke-width="2.5"/>
+                  <path d="M8 20H40M8 29H40M22 10V38" stroke="#DD0031" stroke-width="2"/>
+                </svg>
+              </div>
+              <h2>Section 2: Granular Segment Matrix &amp; Variance Analysis</h2>
+            </div>
+
+            <p style="font-size: 0.72rem; color: #4B5563; margin-bottom: 8px;">
+              Granular breakdown across operational sub-sectors, identifying exact variance against target standards and operational implications.
+            </p>
+
+            <table class="matrix-table">
+              <thead>
+                <tr>
+                  <th style="width:24%;">Sub-Segment / Category</th>
+                  <th style="width:13%;">Prior Baseline</th>
+                  <th style="width:13%;">Current Actual</th>
+                  <th style="width:13%;">Target Standard</th>
+                  <th style="width:14%;">Variance</th>
+                  <th style="width:23%;">Operational Finding &amp; Implication</th>
+                </tr>
+              </thead>
+              <tbody id="p_matrix_tbody">
+                <!-- Dynamically populated rows -->
+              </tbody>
+            </table>
+          </section>
+
+          <!-- Section 3: Sector Tactical Intervention Playbook -->
+          <section class="section-card" id="p-sec3">
+            <div class="section-header">
+              <div class="section-icon-wrap">
+                <svg class="cfa-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="10" y="8" width="28" height="32" rx="4" stroke="#DD0031" stroke-width="2.5"/>
+                  <path d="M16 16H32M16 24H28M16 32H24" stroke="#DD0031" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h2>Section 3: Tactical Intervention Playbook</h2>
+            </div>
+
+            <p style="font-size: 0.72rem; color: #4B5563; margin-bottom: 8px;">
+              High-impact operational interventions designed to systematically address root causes and recover performance gaps.
+            </p>
+
+            <div class="tactics-grid" id="p_tactics_grid">
+              <!-- Dynamically populated 4 cards -->
+            </div>
+
+            <!-- Leadership Protocols Box -->
+            <div class="cta-box">
+              <h4>Leadership Communication Protocols (Aligning Shifts on Standards)</h4>
+              <div class="cta-dialogues">
+                <div class="cta-dialogue-item">
+                  <strong>When Reinforcing Wins (Public Celebration):</strong>
+                  <span id="p_proto_reinforce">"Outstanding job team! Our afternoon shake mix climbed +18% today and check averages passed $14.50. Let's keep that momentum!"</span>
+                </div>
+                <div class="cta-dialogue-item">
+                  <strong>When Correcting Drift (Real-Time Coaching):</strong>
+                  <span id="p_proto_correct">"Let's reset: remember to name the specific craveable item on every ticket instead of asking 'Anything else?'. Specificity drives the result."</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <footer class="a4-footer">
+          <span id="p_footer_p2">Chick-fil-A Executive Operations • Sector Focus Diagnostic</span>
+          <span class="page-number">Page 2 of 3 • Granular Breakdown &amp; Tactical Interventions</span>
+        </footer>
+      </div>
+
+      <!-- ==========================================
+           A4 PAGE 3: ROADMAP, GUARDRAILS, AUDIT & SIGNOFF
+           ========================================== -->
+      <div class="a4-page" id="page-3">
+        <div class="page-content">
+
+          <!-- Section 4: Execution & Milestone Roadmap -->
+          <section class="section-card" id="p-sec4">
+            <div class="section-header">
+              <div class="section-icon-wrap">
+                <svg class="cfa-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="8" y="10" width="32" height="30" rx="3" stroke="#DD0031" stroke-width="2.5"/>
+                  <path d="M8 18H40" stroke="#DD0031" stroke-width="2"/>
+                  <circle cx="16" cy="26" r="2" fill="#DD0031"/>
+                  <circle cx="24" cy="26" r="2" fill="#DD0031"/>
+                  <circle cx="32" cy="26" r="2" fill="#DD0031"/>
+                </svg>
+              </div>
+              <h2>Section 4: Implementation &amp; Milestone Cadence</h2>
+            </div>
+
+            <table class="cadence-table">
+              <thead>
+                <tr>
+                  <th style="width:14%;">Timeframe</th>
+                  <th style="width:26%;">Core Implementation Focus</th>
+                  <th style="width:30%;">Target Metric Checkpoint</th>
+                  <th style="width:30%;">Leadership Verification &amp; Ritual</th>
+                </tr>
+              </thead>
+              <tbody id="p_cadence_tbody">
+                <!-- Dynamically populated 4 rows -->
+              </tbody>
+            </table>
+          </section>
+
+          <!-- Section 5: Operational Guardrails -->
+          <section class="section-card" id="p-sec5">
+            <div class="section-header">
+              <div class="section-icon-wrap">
+                <svg class="cfa-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="24" cy="26" r="16" stroke="#DD0031" stroke-width="2.5"/>
+                  <path d="M24 10V6M21 6H27" stroke="#DD0031" stroke-width="2.5" stroke-linecap="round"/>
+                  <path d="M24 26L24 17M24 26L31 26" stroke="#DD0031" stroke-width="2.2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h2>Section 5: Operational Guardrails</h2>
+            </div>
+
+            <div class="dodont-grid">
+              <div class="dodont-card do">
+                <div class="dodont-header">Disciplines To Enforce (Best Practices)</div>
+                <ul class="dodont-list" id="p_dos_list">
+                  <!-- Populated dynamically -->
+                </ul>
+              </div>
+
+              <div class="dodont-card dont">
+                <div class="dodont-header">Behaviors To Eliminate (Risk &amp; Leakage)</div>
+                <ul class="dodont-list" id="p_donts_list">
+                  <!-- Populated dynamically -->
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 6: Shift Leadership Verification & Sign-Off -->
+          <section class="section-card" id="p-sec6">
+            <div class="section-header">
+              <div class="section-icon-wrap">
+                <svg class="cfa-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="24" cy="14" r="5" stroke="#DD0031" stroke-width="2.2"/>
+                  <path d="M16 32C16 26 19 23 24 23C29 23 32 26 32 32" stroke="#DD0031" stroke-width="2.2" stroke-linecap="round"/>
+                  <circle cx="12" cy="18" r="4" stroke="#DD0031" stroke-width="2"/>
+                  <circle cx="36" cy="18" r="4" stroke="#DD0031" stroke-width="2"/>
+                </svg>
+              </div>
+              <h2>Section 6: Shift Leadership Verification &amp; Executive Sign-Off</h2>
+            </div>
+
+            <p style="font-size: 0.68rem; color: #4B5563; margin-bottom: 6px;">
+              Shift Leaders and Directors execute this 5-point verification standard to sustain field execution and accountability.
+            </p>
+
+            <div class="scorecard-grid" id="p_scorecard_grid">
+              <!-- Dynamically populated 5 items -->
+            </div>
+
+            <!-- Executive Signoff Block -->
+            <div class="signoff-card">
+              <div class="signoff-grid">
+                <div class="signoff-item">
+                  <h6>Sector Director Lead</h6>
+                  <p id="p_so_sponsor">Marcus Vance</p>
+                  <small id="p_so_sp_role">Director of Operations</small>
+                </div>
+                <div class="signoff-item">
+                  <h6>Executive Operator Sign-Off</h6>
+                  <p id="p_so_operator">Dan Cathy / Operator Representative</p>
+                  <small id="p_so_op_role">Franchised Restaurant Operator</small>
+                </div>
+                <div class="signoff-item">
+                  <h6>Next Milestone Review</h6>
+                  <p id="p_so_review">December 15, 2026</p>
+                  <small>Scheduled Diagnostic</small>
+                </div>
+                <div class="signoff-item">
+                  <h6>Intervention Status</h6>
+                  <p id="p_so_status" style="color:var(--cfa-red);">Active Execution</p>
+                  <small>Target Benchmark Aligned</small>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <footer class="a4-footer">
+          <span id="p_footer_p3">Chick-fil-A Executive Operations • Sector Focus Diagnostic • Round Rock, TX</span>
+          <span class="page-number">Page 3 of 3 • Execution Cadence &amp; Executive Sign-Off</span>
+        </footer>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    const PRESETS = {
+  "sales": {
+    "header": {
+      "timeframe_type": "Quarterly Sector Review",
+      "sector": "Sales & Daypart Optimization",
+      "title": "Drive-Thru Sales & Daypart Revenue Optimization",
+      "subtitle": "A granular diagnostic report analyzing drive-thru sales mix, peak daypart capacity constraints, and high-margin attachment opportunities.",
+      "image_src": "teammembers.jpg",
+      "meta1_label": "Store Location",
+      "meta1_val": "Chick-fil-A Round Rock \u2022 Store #03241",
+      "meta2_label": "Reporting Period",
+      "meta2_val": "Q3 2026 (July \u2013 September)",
+      "meta3_label": "Sector Lead",
+      "meta3_val": "Marcus Vance, Director of Operations",
+      "meta4_label": "Review Date",
+      "meta4_val": "October 1, 2026"
+    },
+    "briefing": {
+      "tag": "Executive Diagnostic Briefing",
+      "meta": "Presented at Executive Leadership Quarterly Review",
+      "title": "Q3 Drive-Thru Revenue Trajectory & Capacity Unlocks",
+      "goal": "Surpass $1.8M quarterly drive-thru volume while maintaining sub-2:00 average Speed of Service.",
+      "why": "Lunch peak has achieved physical capacity (192 cars/hr). Further revenue growth requires accelerating afternoon lull mix (+22%) and breakfast beverage attachment.",
+      "focus": "Deploy dedicated outside order takers (IPOS) with structured beverage suggestive prompts during the 1:30\u20134:30 PM lull."
+    },
+    "kpis": [
+      {
+        "name": "Drive-Thru Gross Sales",
+        "actual": "$1,842,500",
+        "target": "$1,700,000",
+        "baseline": "$1,698,000",
+        "variance": "+$144.5K (+8.5%)",
+        "status": "ahead",
+        "status_label": "Ahead of Goal"
+      },
+      {
+        "name": "Average Check Size",
+        "actual": "$14.28",
+        "target": "$13.65",
+        "baseline": "$13.40",
+        "variance": "+$0.63 (+4.6%)",
+        "status": "ahead",
+        "status_label": "Ahead of Goal"
+      },
+      {
+        "name": "Large Meal Conversion",
+        "actual": "28.4%",
+        "target": "32.0%",
+        "baseline": "26.1%",
+        "variance": "-3.6% Gap",
+        "status": "warning",
+        "status_label": "Opportunity Gap"
+      },
+      {
+        "name": "PM Lull (1:30-4:30) Sales",
+        "actual": "$384,100",
+        "target": "$420,000",
+        "baseline": "$362,000",
+        "variance": "-$35.9K (-8.5%)",
+        "status": "warning",
+        "status_label": "Needs Focus"
+      },
+      {
+        "name": "Drive-Thru SOS (Cars/Hr)",
+        "actual": "178 Cars",
+        "target": "185 Cars",
+        "baseline": "165 Cars",
+        "variance": "+13 Cars (+7.8%)",
+        "status": "ontrack",
+        "status_label": "On Track"
+      }
+    ],
+    "pillars": {
+      "p1_title": "1. Positive Drivers & Catalysts",
+      "p1_sub": "Where momentum originated this quarter",
+      "p1_body": "Dinner drive-thru volume surged +12.4% YoY driven by family 30-count nugget meal bundles and delivery integration. Breakfast drive-thru gained +9.1% with hash brown bowl pairings and mobile order curbside transitions.",
+      "p2_title": "2. Friction Points & Leakage",
+      "p2_sub": "Specific bottlenecks hindering maximum yield",
+      "p2_bullets": [
+        "PM Lull Underperformance: Between 1:30 PM and 4:30 PM, lane car counts drop by 44% with minimal dessert/shake upselling.",
+        "Beverage Attachment Drift: Only 21% of a la carte entr\u00e9es were converted into full meals or specialty drinks outside peak hours.",
+        "Cash Cart Handoff Delays: Outside payment processing stalls during high-heat afternoon shifts when mobile expediting is unstaffed."
+      ],
+      "p3_title": "3. High-Leverage Strategic Lever",
+      "p3_sub": "The targeted intervention to close the gap",
+      "p3_body": "Executing a targeted 'Afternoon Crave & Treat' initiative supported by paired IPOS order-taking scripts, mobile dessert pre-staging, and dedicated drink fulfillment during afternoon shifts."
+    },
+    "matrix": [
+      {
+        "segment": "Breakfast (6:30 - 10:30 AM)",
+        "baseline": "$324,500",
+        "actual": "$354,200",
+        "target": "$345,000",
+        "variance": "+$9.2K (+2.7%)",
+        "notes": "Strong biscuit meal conversion; coffee attachments up +18%."
+      },
+      {
+        "segment": "Lunch Peak (11:00 AM - 1:30 PM)",
+        "baseline": "$712,000",
+        "actual": "$745,800",
+        "target": "$740,000",
+        "variance": "+$5.8K (+0.8%)",
+        "notes": "Lanes reached physical maximum (192 cars/hr); window delays limit more cars."
+      },
+      {
+        "segment": "Afternoon Lull (1:30 - 4:30 PM)",
+        "baseline": "$248,000",
+        "actual": "$262,400",
+        "target": "$295,000",
+        "variance": "-$32.6K (-11.0%)",
+        "notes": "Significant lane capacity available; low guest awareness of hand-spun treats."
+      },
+      {
+        "segment": "Dinner Peak (5:00 - 8:00 PM)",
+        "baseline": "$542,000",
+        "actual": "$618,200",
+        "target": "$580,000",
+        "variance": "+$38.2K (+6.6%)",
+        "notes": "Exceptional family nugget & strip tray attachment; delivery drivers well-staged."
+      },
+      {
+        "segment": "Late Night (8:00 - 10:00 PM)",
+        "baseline": "$115,000",
+        "actual": "$124,500",
+        "target": "$120,000",
+        "variance": "+$4.5K (+3.7%)",
+        "notes": "Healthy shake and dessert orders; bagger speed remains high."
+      }
+    ],
+    "tactics": [
+      {
+        "category": "1. Afternoon Treat Campaign",
+        "trigger": "Low car volume & check size between 1:30\u20134:30 PM",
+        "action": "Implement mandatory 'Can we treat you to a hand-spun Cookies & Cream shake or warm brownie?' on all IPOS orders.",
+        "impact": "+$2,800 weekly incremental sales; lift shake mix from 4.8% to 8.2%.",
+        "owner": "Sarah Jenkins (PM Drive-Thru Director)"
+      },
+      {
+        "category": "2. Meal Bundle Scripting",
+        "trigger": "Single sandwich/entree orders without fries or drinks",
+        "action": "Train order takers to immediately offer: 'Would you like to make that a large fry and fresh Sunjoy today?'",
+        "impact": "Convert 35% of single entr\u00e9es into full meals (+ $1.85 avg check lift).",
+        "owner": "Marcus Vance (Director of Operations)"
+      },
+      {
+        "category": "3. Outside Cash Cart Deployment",
+        "trigger": "Lane stacking exceeds 8 cars past the ordering canopy",
+        "action": "Deploy mobile expediter with handheld card reader to finalize payments 3 cars ahead of the transaction window.",
+        "impact": "Reduces window presentation bottleneck by 18 seconds per vehicle.",
+        "owner": "David Kim (Lead Drive-Thru Trainer)"
+      },
+      {
+        "category": "4. Mobile App Ordering Push",
+        "trigger": "Frequent business commuters ordering single meals",
+        "action": "Place bag-stuffer QR cards highlighting 'Skip the Queue & Earn CFA One Points on Drive-Thru Pickups'.",
+        "impact": "Migrate 15% of peak cash/card orders to digital mobile pre-orders.",
+        "owner": "Elena Rostova (Marketing Director)"
+      }
+    ],
+    "closing_protocols": {
+      "reinforce": "\"Outstanding job team! Our afternoon shake mix climbed +18% today and check averages passed $14.50. Let's keep that momentum!\"",
+      "correct": "\"Let's reset: remember to name the specific craveable item on every ticket instead of asking 'Anything else?'. Specificity drives the result.\""
+    },
+    "cadence": [
+      {
+        "period": "Week 1",
+        "focus": "Scripting Refresh & Coaching Huddles",
+        "metric": "100% of IPOS team completes 5-Car Shadow Audit",
+        "action": "Shift leaders conduct 60-second pre-shift huddle on afternoon upselling."
+      },
+      {
+        "period": "Week 2",
+        "focus": "Afternoon Shake & Treat Station Staging",
+        "metric": "+20% Hand-Spun Shake Volume (1:30\u20134:30 PM)",
+        "action": "Pre-stage shake bases and mix-ins at 1:15 PM daily to eliminate prep delays."
+      },
+      {
+        "period": "Week 3",
+        "focus": "Mobile Expediting Lane Integration",
+        "metric": "Window dwell time drops below 32 seconds",
+        "action": "Rotate 2 expediters into lane during lunch peak with dedicated drink runners."
+      },
+      {
+        "period": "Week 4",
+        "focus": "Executive Milestone Audit & Recognition",
+        "metric": "Drive-Thru check average sustains above $14.25",
+        "action": "Reward top 3 upselling champions with monthly store leadership spotlight."
+      }
+    ],
+    "guardrails": {
+      "dos": [
+        "Name a specific craveable item (e.g. 'large waffle fry', 'Sunjoy', 'peach shake').",
+        "Offer suggestion immediately after main entr\u00e9e is keyed into POS.",
+        "Accept declinations instantly and warmly: 'My pleasure, your total is...'",
+        "Keep total outside order-taking interaction under 22 seconds per vehicle."
+      ],
+      "donts": [
+        "Never ask passive, open-ended questions like 'Anything else for you?'",
+        "Never push a secondary upsell if the guest politely declines the first.",
+        "Never let suggestive selling compromise queue momentum or cause lane stalls.",
+        "Never leave order staging unattended during peak daypart transitions."
+      ]
+    },
+    "scorecard": [
+      {
+        "title": "1. Upbeat Eye Contact & Welcome",
+        "desc": "Team member welcomes vehicle warmly within 5 seconds of pulling up."
+      },
+      {
+        "title": "2. Craveable Specific Suggestion",
+        "desc": "Names specific drink/treat rather than generic 'drink or dessert?'."
+      },
+      {
+        "title": "3. Rapid POS Navigation",
+        "desc": "Order modifications completed with zero hesitations or rework."
+      },
+      {
+        "title": "4. Seamless Order Storing",
+        "desc": "Ticket stored and sequenced immediately so kitchen queue flows."
+      },
+      {
+        "title": "5. Authentic 'My Pleasure' Close",
+        "desc": "Closes interaction with remarkable Second-Mile hospitality."
+      }
+    ],
+    "signoff": {
+      "sponsor": "Marcus Vance",
+      "sponsor_role": "Director of Operations",
+      "operator": "Dan Cathy / Operator Representative",
+      "operator_role": "Franchised Restaurant Operator",
+      "next_review": "December 15, 2026",
+      "milestone_status": "Q3 Target Achieved \u2022 Deploying Q4 Focus"
+    },
+    "footer": "Chick-fil-A Executive Operations \u2022 Sector Focus Diagnostic Report \u2022 Round Rock, TX"
+  },
+  "profit": {
+    "header": {
+      "timeframe_type": "Monthly Sector Focus",
+      "sector": "Profitability, Food Cost & Waste Control",
+      "title": "Food Cost, Chicken Yield & Kitchen Waste Containment",
+      "subtitle": "A monthly deep-dive diagnostic analyzing raw protein variance, oil quality longevity, sauce dispensing yields, and kitchen holding timer discipline.",
+      "image_src": "teammembers.jpg",
+      "meta1_label": "Store Location",
+      "meta1_val": "Chick-fil-A Round Rock \u2022 Store #03241",
+      "meta2_label": "Reporting Period",
+      "meta2_val": "September 2026 (Month-End)",
+      "meta3_label": "Sector Lead",
+      "meta3_val": "Carlos Mendez, Kitchen Director",
+      "meta4_label": "Review Date",
+      "meta4_val": "October 2, 2026"
+    },
+    "briefing": {
+      "tag": "Kitchen Financial Diagnostic",
+      "meta": "Monthly Controllable Cost & Margin Review",
+      "title": "September Gap-to-Goal & Raw Protein Containment",
+      "goal": "Reduce raw chicken cost gap by 0.55% and lower monthly kitchen waste below $3,000.",
+      "why": "Raw protein waste represented $4,850 in avoidable loss this month, predominantly driven by batch over-breading during transition hours (2:00\u20134:30 PM).",
+      "focus": "Strict adherence to Lean Kitchen batch sizes and enforcing the 20-minute holding timer standard on all heated chutes."
+    },
+    "kpis": [
+      {
+        "name": "Food Cost % of Sales",
+        "actual": "26.42%",
+        "target": "25.75%",
+        "baseline": "26.85%",
+        "variance": "+0.67% Gap",
+        "status": "warning",
+        "status_label": "Exceeds Target"
+      },
+      {
+        "name": "Raw Chicken Gap-to-Goal",
+        "actual": "+0.82%",
+        "target": "< 0.30%",
+        "baseline": "+1.15%",
+        "variance": "+0.52% Loss",
+        "status": "warning",
+        "status_label": "Unfavorable Gap"
+      },
+      {
+        "name": "Recorded Waste ($)",
+        "actual": "$4,850",
+        "target": "$3,200",
+        "baseline": "$5,420",
+        "variance": "+$1,650 Over",
+        "status": "warning",
+        "status_label": "Over Budget"
+      },
+      {
+        "name": "Fryer Oil Usable Life",
+        "actual": "14.2 Days",
+        "target": "14.0 Days",
+        "baseline": "11.5 Days",
+        "variance": "+2.7 Days (+23%)",
+        "status": "ahead",
+        "status_label": "Excellent Yield"
+      },
+      {
+        "name": "Condiment Cost / $1K Sales",
+        "actual": "$18.40",
+        "target": "$16.20",
+        "baseline": "$19.10",
+        "variance": "+$2.20 Over",
+        "status": "warning",
+        "status_label": "Needs Control"
+      }
+    ],
+    "pillars": {
+      "p1_title": "1. What Generated Financial Savings",
+      "p1_sub": "Operational wins that protected store gross margin",
+      "p1_body": "Fryer oil management delivered $1,280 in monthly savings. Implementing daily magnesol filtering twice per shift extended oil lifespan from 11.5 to 14.2 days without sacrificing golden crunch standards.",
+      "p2_title": "2. Primary Sources of Margin Leakage",
+      "p2_sub": "Where controllable dollars were lost in the kitchen",
+      "p2_bullets": [
+        "Batch Over-Breading at 2:00 PM: Breading tables dropped full 30-head chicken drops right before volume slowed down, causing $2,400 in timed-out fillet discards.",
+        "Sauce Staging Over-Portioning: Drive-thru baggers routinely placed 3 to 4 sauces per single meal without guest request, adding $0.18 in unrecovered expense per transaction.",
+        "End-of-Night Inventory Variance: Nightly closing counts exhibited counting errors in thaw cabinets and prepped lettuce cases, skewing weekly gap-to-goal reports."
+      ],
+      "p3_title": "3. Corrective Intervention Lever",
+      "p3_sub": "The high-impact operational standard to mandate",
+      "p3_body": "Enforce strict 'Demand-Based Breading Charts' during off-peak hours and introduce standardized 2-sauce maximum bagger prompts unless guest explicitly requests additional portions."
+    },
+    "matrix": [
+      {
+        "segment": "Fillets & Spicy Chicken",
+        "baseline": "$18,200",
+        "actual": "$19,650",
+        "target": "$18,400",
+        "variance": "+$1,250 (+6.8%)",
+        "notes": "Timed-out holding in warming chutes during mid-afternoon; over-breading."
+      },
+      {
+        "segment": "Nuggets & Strips",
+        "baseline": "$14,500",
+        "actual": "$15,100",
+        "target": "$14,200",
+        "variance": "+$900 (+6.3%)",
+        "notes": "Drop sizes exceeded afternoon demand chart by 1.5x; high hold waste."
+      },
+      {
+        "segment": "Waffle Fries & Canola Oil",
+        "baseline": "$8,200",
+        "actual": "$7,450",
+        "target": "$7,800",
+        "variance": "-$350 (-4.5%)",
+        "notes": "Outstanding oil filtering discipline reduced fresh oil box consumption."
+      },
+      {
+        "segment": "Sauces & Condiments",
+        "baseline": "$6,800",
+        "actual": "$7,420",
+        "target": "$6,500",
+        "variance": "+$920 (+14.1%)",
+        "notes": "Baggers over-stuffing sauce pouches; bagger retraining mandatory."
+      },
+      {
+        "segment": "Produce & Fresh Prep",
+        "baseline": "$5,400",
+        "actual": "$5,650",
+        "target": "$5,300",
+        "variance": "+$350 (+6.6%)",
+        "notes": "Prepping tomatoes too far in advance resulting in end-of-night discard."
+      }
+    ],
+    "tactics": [
+      {
+        "category": "1. Lean Breading Chart Strictness",
+        "trigger": "Afternoon hold discards in kitchen warming chutes",
+        "action": "Mandate maximum 12-head drops between 1:30 PM and 4:30 PM. Breading lead must sign off on drop size board.",
+        "impact": "Eliminates $650/week in timed-out chicken waste.",
+        "owner": "Carlos Mendez (Kitchen Director)"
+      },
+      {
+        "category": "2. Bagger Sauce Portion Standard",
+        "trigger": "Condiment costs exceeding $16.20 per $1,000 sales",
+        "action": "Standardize default 1 sauce for meals / 2 for 8-count unless guest asks. Retrain all FOH baggers.",
+        "impact": "Saves $850 monthly in uncounted sauce inventory.",
+        "owner": "Sarah Jenkins (PM Drive-Thru Director)"
+      },
+      {
+        "category": "3. Timer Compliance & Chute Audits",
+        "trigger": "Chicken held past 20-minute holding timer window",
+        "action": "Kitchen Shift Leads conduct random 15-minute timer audits; reset timers are strictly logged as waste.",
+        "impact": "Guarantees highest chicken quality while pinpointing exact over-production times.",
+        "owner": "Travis Coleman (Kitchen Shift Lead)"
+      },
+      {
+        "category": "4. Thaw Cabinet Nightly Precision Count",
+        "trigger": "Discrepancy between POS sales and raw box drawdown",
+        "action": "Institute two-person verification for nightly inventory closing counts in walk-in cooler and freezer.",
+        "impact": "Resolves inventory counting drift and brings gap-to-goal tracking within +/- 0.15%.",
+        "owner": "Elena Rostova (Inventory Coordinator)"
+      }
+    ],
+    "closing_protocols": {
+      "reinforce": "\"Excellent discipline today on the fryers and breading drops! We held kitchen waste under $45 for the entire shift while delivering perfect food quality.\"",
+      "correct": "\"Remember: never drop a full 30-head run of chicken when the queue is under 4 cars. Check the screen, drop small batches, and preserve our food quality.\""
+    },
+    "cadence": [
+      {
+        "period": "Week 1",
+        "focus": "Lean Breading Board Re-Launch",
+        "metric": "Daily raw chicken waste drops below $90/day",
+        "action": "Post laminated batch size guide above breading table; conduct mandatory kitchen shift briefing."
+      },
+      {
+        "period": "Week 2",
+        "focus": "Bagger Sauce Discipline & Signage",
+        "metric": "Condiment cost per $1K sales drops to $16.80",
+        "action": "Shadow drive-thru window and bagger packing; audit 20 random customer bags."
+      },
+      {
+        "period": "Week 3",
+        "focus": "Holding Timer & Waste Bucket Reconciliation",
+        "metric": "Zero untracked chicken thrown in general trash",
+        "action": "All discarded protein weighed and logged into digital waste log before disposal."
+      },
+      {
+        "period": "Week 4",
+        "focus": "End-of-Month Yield & Margin Audit",
+        "metric": "Raw chicken gap-to-goal achieves < 0.40%",
+        "action": "Executive review with Kitchen Director and Operator to review financial savings."
+      }
+    ],
+    "guardrails": {
+      "dos": [
+        "Follow real-time KPS monitor orders before dropping chicken into fryers.",
+        "Log every single piece of timed-out or dropped chicken in the waste log.",
+        "Filter all fryers twice per shift using the automated magnesol cycle.",
+        "Double-check thaw cabinet date tags to ensure strict First-In, First-Out (FIFO)."
+      ],
+      "donts": [
+        "Never reset holding timers to keep cold or expired chicken in the chutes.",
+        "Never bread more than 12 fillets at a time during afternoon lull (1:30\u20134:30 PM).",
+        "Never toss chicken waste into regular trash without weighing and recording.",
+        "Never overload sauce pouches with 4+ cups unless customer explicitly requested."
+      ]
+    },
+    "scorecard": [
+      {
+        "title": "1. Batch Size Accuracy",
+        "desc": "Drop size on breading board matches real-time lane demand."
+      },
+      {
+        "title": "2. Holding Timer Active",
+        "desc": "Timers engaged on all warming chutes; zero untimed chicken."
+      },
+      {
+        "title": "3. Oil Filtering Completed",
+        "desc": "Daily morning and afternoon filter cycles logged and verified."
+      },
+      {
+        "title": "4. Waste Bucket Protocol",
+        "desc": "All kitchen discards placed in dedicated red buckets and logged."
+      },
+      {
+        "title": "5. Closing Inventory Audit",
+        "desc": "Two-person count of raw cases in walk-in completed accurately."
+      }
+    ],
+    "signoff": {
+      "sponsor": "Carlos Mendez",
+      "sponsor_role": "Kitchen Director",
+      "operator": "Dan Cathy / Operator Representative",
+      "operator_role": "Franchised Restaurant Operator",
+      "next_review": "November 5, 2026",
+      "milestone_status": "Intervention Active \u2022 Target Gap < 0.40%"
+    },
+    "footer": "Chick-fil-A Kitchen Operations \u2022 Food Cost & Waste Diagnostic \u2022 Round Rock, TX"
+  },
+  "talent": {
+    "header": {
+      "timeframe_type": "Quarterly Sector Review",
+      "sector": "Talent, Retention & Leadership Pipeline",
+      "title": "90-Day Team Member Retention & Shift Leader Pipeline",
+      "subtitle": "A quarterly diagnostic analyzing new hire onboarding drop-off, Certified Trainer development velocity, CEM hospitality scores by shift, and leadership bench depth.",
+      "image_src": "teammembers.jpg",
+      "meta1_label": "Store Location",
+      "meta1_val": "Chick-fil-A Round Rock \u2022 Store #03241",
+      "meta2_label": "Reporting Period",
+      "meta2_val": "Q3 2026 (July \u2013 September)",
+      "meta3_label": "Sector Lead",
+      "meta3_val": "Rachel Thorne, Director of Talent",
+      "meta4_label": "Review Date",
+      "meta4_val": "October 3, 2026"
+    },
+    "briefing": {
+      "tag": "Talent & Culture Diagnostic",
+      "meta": "Quarterly People & Leadership Review",
+      "title": "New Hire 90-Day Survival & High-Potential Leader Bench",
+      "goal": "Lift 90-day new hire retention from 71.4% to 85.0% and certify 6 new Shift Leaders by Q4.",
+      "why": "The majority of team turnover (64%) occurs between Day 14 and Day 45, primarily due to overwhelmed trainees left unshadowed during lunch rush peaks.",
+      "focus": "Establish a mandatory 1:1 'Trainer Anchor' for all new hires during their first 30 days, backed by Day 14 and Day 30 formal check-ins with Talent Leadership."
+    },
+    "kpis": [
+      {
+        "name": "90-Day Retention Rate",
+        "actual": "72.4%",
+        "target": "85.0%",
+        "baseline": "68.2%",
+        "variance": "-12.6% Gap",
+        "status": "warning",
+        "status_label": "High Priority"
+      },
+      {
+        "name": "Active Certified Trainers",
+        "actual": "14 Trainers",
+        "target": "18 Trainers",
+        "baseline": "11 Trainers",
+        "variance": "+3 Net (+27%)",
+        "status": "ahead",
+        "status_label": "Building Bench"
+      },
+      {
+        "name": "Shift Leader Bench Depth",
+        "actual": "4 Candidates",
+        "target": "6 Candidates",
+        "baseline": "2 Candidates",
+        "variance": "-2 Gap",
+        "status": "warning",
+        "status_label": "In Development"
+      },
+      {
+        "name": "CEM Attentive & Courteous",
+        "actual": "82.5%",
+        "target": "85.0%",
+        "baseline": "79.1%",
+        "variance": "-2.5% Gap",
+        "status": "ontrack",
+        "status_label": "Improving"
+      },
+      {
+        "name": "Training Completion (Pathway)",
+        "actual": "94.2%",
+        "target": "90.0%",
+        "baseline": "82.0%",
+        "variance": "+4.2% Above",
+        "status": "ahead",
+        "status_label": "Ahead of Goal"
+      }
+    ],
+    "pillars": {
+      "p1_title": "1. What Worked in Q3",
+      "p1_sub": "Positive retention and cultural wins",
+      "p1_body": "Digital Pathway module completion reached an all-time high of 94.2%. Team Member engagement surveys showed strong alignment with store values and 88% satisfaction with flexible scheduling software.",
+      "p2_title": "2. Root Causes of Early Turnover",
+      "p2_sub": "Where new hires experience friction and leave",
+      "p2_bullets": [
+        "The 'Week 3 Cliff': New hires feel isolated when transitioned from 1:1 training into full peak rush positions without an assigned mentor.",
+        "Inconsistent Shadowing: 40% of trainees reported being pulled onto solo stations before completing their practical station check-offs.",
+        "Delayed Feedback Loops: Shift leaders rarely conducted the formal 30-day performance review, leaving trainees uncertain about their growth."
+      ],
+      "p3_title": "3. Strategic Talent Solution",
+      "p3_sub": "The structural operational change",
+      "p3_body": "Institute the 'Pathway Anchor System': Every new hire is permanently paired with a senior Certified Trainer for their first 45 days, with mandatory 15-minute weekly one-on-ones to troubleshoot station anxiety."
+    },
+    "matrix": [
+      {
+        "segment": "Days 1 - 14 (Orientation & Basics)",
+        "baseline": "92.0%",
+        "actual": "95.5%",
+        "target": "95.0%",
+        "variance": "+0.5% Ahead",
+        "notes": "Classroom orientation and Pathway completion are structured and effective."
+      },
+      {
+        "segment": "Days 15 - 30 (First Peak Shifts)",
+        "baseline": "74.0%",
+        "actual": "78.2%",
+        "target": "88.0%",
+        "variance": "-9.8% Gap",
+        "notes": "Critical drop-off window; trainees feel overwhelmed on IPOS and Bagger."
+      },
+      {
+        "segment": "Days 31 - 60 (Station Independence)",
+        "baseline": "81.0%",
+        "actual": "84.5%",
+        "target": "90.0%",
+        "variance": "-5.5% Gap",
+        "notes": "Lack of structured feedback causes stagnation; 30-day reviews now mandatory."
+      },
+      {
+        "segment": "Days 61 - 90 (Tenured Team Member)",
+        "baseline": "91.0%",
+        "actual": "94.0%",
+        "target": "95.0%",
+        "variance": "-1.0% Close",
+        "notes": "High stability once team members reach 60 days; high friendship attachment."
+      },
+      {
+        "segment": "Trainer-to-Leader Track",
+        "baseline": "2 Leads",
+        "actual": "4 Leads",
+        "target": "6 Leads",
+        "variance": "-2 Leads",
+        "notes": "4 high-potential trainers currently enrolled in Shift Leader Academy."
+      }
+    ],
+    "tactics": [
+      {
+        "category": "1. 30-Day Mentor Anchor",
+        "trigger": "New hire reaches Day 14 of solo shifts",
+        "action": "Pair every trainee with a designated Certified Trainer mentor who works at least 3 matching shifts per week.",
+        "impact": "Reduces early onboarding attrition by 35% in first 45 days.",
+        "owner": "Rachel Thorne (Director of Talent)"
+      },
+      {
+        "category": "2. Station Readiness Sign-Offs",
+        "trigger": "Trainee moved to primary rush station (IPOS, Bagger, Fries)",
+        "action": "Mandatory physical checklist signed by both Trainer and Shift Leader before trainee works unshadowed peak rush.",
+        "impact": "Eliminates solo panic and protects peak drive-thru speed.",
+        "owner": "David Kim (Lead Trainer)"
+      },
+      {
+        "category": "3. Milestone Touchpoint Cadence",
+        "trigger": "Days 14, 30, and 60 on the schedule",
+        "action": "Shift Leader conducts formal 10-minute sit-down feedback session over a free meal to celebrate wins and address friction.",
+        "impact": "Builds trust and early loyalty; surfaces scheduling conflicts immediately.",
+        "owner": "Marcus Vance (Director of Operations)"
+      },
+      {
+        "category": "4. Shift Leader Academy Cohort",
+        "trigger": "Tenured trainers seeking leadership promotion",
+        "action": "Launch bi-weekly leadership development workshop covering labor management, conflict resolution, and food safety.",
+        "impact": "Certify 4 new Shift Leaders by November 15 to support holiday rush.",
+        "owner": "Dan Cathy / Operator Representative"
+      }
+    ],
+    "closing_protocols": {
+      "reinforce": "\"Thank you for championing our new team members! Seeing our trainers step in with patience and encouragement during lunch rush represents true Chick-fil-A leadership.\"",
+      "correct": "\"If you notice a trainee struggling on a rush station, do not pull them off abruptly. Step in beside them, breathe, support the bottleneck, and coach through it.\""
+    },
+    "cadence": [
+      {
+        "period": "Week 1",
+        "focus": "Launch Anchor Mentor Program",
+        "metric": "100% of current trainees assigned a designated Trainer Anchor",
+        "action": "Talent Director hosts 30-minute kickoff meeting with all 14 Certified Trainers."
+      },
+      {
+        "period": "Week 2",
+        "focus": "Station Competency Checklist Enforcement",
+        "metric": "Zero uncertified trainees placed solo on peak drive-thru stations",
+        "action": "Audit shift rosters against physical training certification log."
+      },
+      {
+        "period": "Week 3",
+        "focus": "Day 14 & 30 Milestone Review Execution",
+        "metric": "100% completion rate on scheduled new hire touchpoints",
+        "action": "Shift leaders log completed touchpoints in the digital leadership binder."
+      },
+      {
+        "period": "Week 4",
+        "focus": "Shift Leader Academy Mid-Term Evaluation",
+        "metric": "4 leader candidates complete Floor Management Simulation",
+        "action": "Operator and Talent Director observe candidate-led shift during Saturday peak."
+      }
+    ],
+    "guardrails": {
+      "dos": [
+        "Welcome new team members by name at the start of every single shift.",
+        "Provide constructive feedback in private and celebrate wins publicly.",
+        "Protect training shifts: never cut a trainee's shadow hours to trim labor.",
+        "Conduct the Day 14 and Day 30 sit-down touchpoints without fail."
+      ],
+      "donts": [
+        "Never leave a new hire alone on a high-stress station during their first 2 weeks.",
+        "Never dismiss a trainee's scheduling or availability concerns without discussion.",
+        "Never allow cynical or disparaging comments about new team members.",
+        "Never promote team members to leadership without structured station certification."
+      ]
+    },
+    "scorecard": [
+      {
+        "title": "1. Warm Shift Welcome",
+        "desc": "Trainee greeted with hospitality and introduced to shift anchor."
+      },
+      {
+        "title": "2. Dedicated Shadowing",
+        "desc": "Trainer remains within arm's reach during peak volume rushes."
+      },
+      {
+        "title": "3. Positive Coaching Ratio",
+        "desc": "Maintains 3:1 ratio of encouragement to corrective instructions."
+      },
+      {
+        "title": "4. Touchpoint Executed",
+        "desc": "Day 14/30 milestone conversation conducted on schedule."
+      },
+      {
+        "title": "5. End-of-Shift Debrief",
+        "desc": "Shift leader thanks trainee and summarizes key growth areas."
+      }
+    ],
+    "signoff": {
+      "sponsor": "Rachel Thorne",
+      "sponsor_role": "Director of Talent",
+      "operator": "Dan Cathy / Operator Representative",
+      "operator_role": "Franchised Restaurant Operator",
+      "next_review": "December 1, 2026",
+      "milestone_status": "Retention Initiative Active \u2022 Target 85%"
+    },
+    "footer": "Chick-fil-A Talent & Culture \u2022 Sector Diagnostic Report \u2022 Round Rock, TX"
+  },
+  "speed": {
+    "header": {
+      "timeframe_type": "Monthly Sector Focus",
+      "sector": "Speed of Service & Drive-Thru Throughput",
+      "title": "Peak Drive-Thru Speed of Service & Lane Throughput",
+      "subtitle": "A targeted monthly operational diagnostic identifying drive-thru queue bottlenecks, window presentation latency, multi-lane sequencing, and kitchen hold times.",
+      "image_src": "teammembers.jpg",
+      "meta1_label": "Store Location",
+      "meta1_val": "Chick-fil-A Round Rock \u2022 Store #03241",
+      "meta2_label": "Reporting Period",
+      "meta2_val": "August 2026 (Month-End)",
+      "meta3_label": "Sector Lead",
+      "meta3_val": "David Kim, Drive-Thru Director",
+      "meta4_label": "Review Date",
+      "meta4_val": "September 5, 2026"
+    },
+    "briefing": {
+      "tag": "Throughput Diagnostic",
+      "meta": "Monthly Speed of Service Performance Audit",
+      "title": "Lunch Peak 12:00\u20131:00 PM Bottlenecks & Capacity Unlocks",
+      "goal": "Achieve 210 cars per peak lunch hour and reduce average window dwell time to under 28 seconds.",
+      "why": "Peak car throughput stalled at 184 cars/hr due to a 38-second window presentation delay caused by specialty drink preparation and out-of-sequence food bags.",
+      "focus": "Deploy a dedicated Outside Drink Runner and enforce strict bag sequencing before orders reach the final presentation window."
+    },
+    "kpis": [
+      {
+        "name": "Peak Lunch Throughput",
+        "actual": "184 Cars/Hr",
+        "target": "210 Cars/Hr",
+        "baseline": "172 Cars/Hr",
+        "variance": "-26 Cars Gap",
+        "status": "warning",
+        "status_label": "Capacity Blocked"
+      },
+      {
+        "name": "Window Presentation Time",
+        "actual": "38.5 Sec",
+        "target": "28.0 Sec",
+        "baseline": "41.2 Sec",
+        "variance": "+10.5 Sec Delay",
+        "status": "warning",
+        "status_label": "Window Latency"
+      },
+      {
+        "name": "Multi-Lane Sequencing Acc.",
+        "actual": "98.4%",
+        "target": "99.0%",
+        "baseline": "96.5%",
+        "variance": "+1.9% Improved",
+        "status": "ontrack",
+        "status_label": "On Track"
+      },
+      {
+        "name": "Kitchen Hold Time (Screen)",
+        "actual": "42 Sec",
+        "target": "30 Sec",
+        "baseline": "55 Sec",
+        "variance": "+12 Sec Gap",
+        "status": "warning",
+        "status_label": "Fries Lagging"
+      },
+      {
+        "name": "CEM Fast Service Score",
+        "actual": "79.2%",
+        "target": "84.0%",
+        "baseline": "76.0%",
+        "variance": "-4.8% Gap",
+        "status": "warning",
+        "status_label": "Guest Friction"
+      }
+    ],
+    "pillars": {
+      "p1_title": "1. Operational Momentum",
+      "p1_sub": "Where speed improved this month",
+      "p1_body": "Dual outside order-taking (IPOS) achieved a blistering 18-second average order entry time. Outside mobile cashiers processed payments ahead of the corner, keeping line momentum fluid.",
+      "p2_title": "2. Primary Speed Chokepoints",
+      "p2_sub": "Where seconds were lost in the queue",
+      "p2_bullets": [
+        "The Drink Station Chokepoint: Specialty beverages (lemonades, milkshakes, Sunjoys) lagged behind bagged entrees by an average of 14 seconds.",
+        "Bag Sequencing Drift: Baggers placed bags in holding chutes out of sequence when cars merged from two lanes into one, causing window team to scramble.",
+        "Waffle Fry Drops: Fries were held on short drops during volume spikes, causing the presentation window to park cars unnecessarily."
+      ],
+      "p3_title": "3. The Throughput Solution",
+      "p3_sub": "The high-impact operational standard",
+      "p3_body": "Implement a 3-Person Staging Pod at the drive-thru window: 1 Bagger, 1 Dedicated Drink Dispenser, and 1 Outside Door Runner delivering bags 2 cars before the window."
+    },
+    "matrix": [
+      {
+        "segment": "Order Taking (Outside IPOS)",
+        "baseline": "22.5s",
+        "actual": "18.2s",
+        "target": "20.0s",
+        "variance": "-1.8s (Fast)",
+        "notes": "Excellent order-taking cadence; menu knowledge is solid."
+      },
+      {
+        "segment": "Payment Tender (Cash Cart)",
+        "baseline": "16.0s",
+        "actual": "14.1s",
+        "target": "15.0s",
+        "variance": "-0.9s (Fast)",
+        "notes": "Card tap reader operational; mobile payments quick."
+      },
+      {
+        "segment": "Kitchen Food Assembly",
+        "baseline": "55.0s",
+        "actual": "42.0s",
+        "target": "30.0s",
+        "variance": "+12.0s Delay",
+        "notes": "Waffle fry chute empty during mini-rushes; fry cook retraining."
+      },
+      {
+        "segment": "Drink & Shake Fulfillment",
+        "baseline": "48.0s",
+        "actual": "46.5s",
+        "target": "25.0s",
+        "variance": "+21.5s Delay",
+        "notes": "Major bottleneck; drink makers overwhelmed by custom orders."
+      },
+      {
+        "segment": "Window Presentation Handoff",
+        "baseline": "41.2s",
+        "actual": "38.5s",
+        "target": "28.0s",
+        "variance": "+10.5s Delay",
+        "notes": "Door runner deployment will immediately shave 12+ seconds."
+      }
+    ],
+    "tactics": [
+      {
+        "category": "1. Outside Door Runner Pod",
+        "trigger": "Lane backup past window with completed food ready",
+        "action": "Deploy door runner with magnetic bag clipboards to hand food to vehicles 2 cars before reaching the physical window.",
+        "impact": "Unlocks 25+ cars per peak hour by clearing the physical window queue.",
+        "owner": "David Kim (Drive-Thru Director)"
+      },
+      {
+        "category": "2. Secondary Drink Station Staging",
+        "trigger": "Drink station screen showing > 4 tickets in red",
+        "action": "Assign a dedicated secondary drink preparer during 11:30 AM\u20131:30 PM solely focused on lemonade, tea, and shakes.",
+        "impact": "Brings drink completion time in sync with kitchen bagging (sub-25s).",
+        "owner": "Sarah Jenkins (PM Operations Lead)"
+      },
+      {
+        "category": "3. Continuous Fry Drop Cadence",
+        "trigger": "Window parking cars waiting for waffle fries",
+        "action": "Fry cook drops continuous half-baskets on a rolling 90-second cycle instead of waiting for empty chutes.",
+        "impact": "Eliminates 90% of waffle fry hold times during rush peaks.",
+        "owner": "Carlos Mendez (Kitchen Director)"
+      },
+      {
+        "category": "4. Vehicle Sequencing Double-Check",
+        "trigger": "Vehicles changing order at merge point",
+        "action": "Baggers visually verify car color and make on POS screen before sealing the order bag.",
+        "impact": "Increases sequencing accuracy to 99.5% and prevents wrong-bag handoffs.",
+        "owner": "Travis Coleman (Shift Leader)"
+      }
+    ],
+    "closing_protocols": {
+      "reinforce": "\"Incredible energy in the lanes today! Our door runners cleared 202 cars during lunch rush with zero parked cars. That is true speed of service!\"",
+      "correct": "\"If drinks are lagging behind food, call it out immediately over the headset: 'Drink station needs support!' Never let an order sit at the window without asking for help.\""
+    },
+    "cadence": [
+      {
+        "period": "Week 1",
+        "focus": "Door Runner Staging Protocol",
+        "metric": "Window presentation time drops to 32 seconds",
+        "action": "Equip outside door runner with safety vest, tablet, and mobile drink caddy."
+      },
+      {
+        "period": "Week 2",
+        "focus": "Drink Station Dual-Staffing",
+        "metric": "Drink fulfillment time drops under 30 seconds",
+        "action": "Shift leaders schedule 2 drink makers during 11:30 AM\u20131:30 PM without exception."
+      },
+      {
+        "period": "Week 3",
+        "focus": "Continuous Fry Drop Certification",
+        "metric": "Zero cars parked for fries across all lunch peaks",
+        "action": "Kitchen Director times fry cook drop cadence for 5 consecutive rushes."
+      },
+      {
+        "period": "Week 4",
+        "focus": "210 Cars/Hour Throughput Challenge",
+        "metric": "Achieve 210+ cars/hour on Friday lunch peak",
+        "action": "Celebrate milestone with team pizza party and recognition pins."
+      }
+    ],
+    "guardrails": {
+      "dos": [
+        "Stage bags in exact sequential order by vehicle order number.",
+        "Keep the drive-thru window open and engaged: greet approaching cars before they stop.",
+        "Always park cars gracefully if food has an unavoidable hold past 45 seconds.",
+        "Communicate delays instantly via headset: 'Holding 30 seconds on spicy fillets!'"
+      ],
+      "donts": [
+        "Never let completed food bags sit on the counter while drinks are being made.",
+        "Never leave the drive-thru window unstaffed to grab napkins or condiments.",
+        "Never allow cars to merge out of sequence without correcting on the expediter screen.",
+        "Never compromise food safety or accuracy in the name of speed."
+      ]
+    },
+    "scorecard": [
+      {
+        "title": "1. Rapid IPOS Greeting",
+        "desc": "Vehicle engaged within 5 seconds of pulling to ordering station."
+      },
+      {
+        "title": "2. Pre-Window Payment",
+        "desc": "Payment finalized before vehicle reaches the final corner."
+      },
+      {
+        "title": "3. Synchronized Drinks & Food",
+        "desc": "Beverage and bagged food united simultaneously at presentation."
+      },
+      {
+        "title": "4. Door Runner Active",
+        "desc": "Door runner delivering bags 2 cars ahead of window during rush."
+      },
+      {
+        "title": "5. Courteous Speed Exit",
+        "desc": "Vehicle departs with genuine 'My Pleasure' in under 28 seconds."
+      }
+    ],
+    "signoff": {
+      "sponsor": "David Kim",
+      "sponsor_role": "Drive-Thru Director",
+      "operator": "Dan Cathy / Operator Representative",
+      "operator_role": "Franchised Restaurant Operator",
+      "next_review": "October 10, 2026",
+      "milestone_status": "Speed Intervention Active \u2022 Target 210 Cars/Hr"
+    },
+    "footer": "Chick-fil-A Drive-Thru Operations \u2022 Speed & Throughput Diagnostic \u2022 Round Rock, TX"
+  },
+  "catering": {
+    "header": {
+      "timeframe_type": "Annual Strategic Focus",
+      "sector": "Outside Sales & Community Catering",
+      "title": "Annual Catering Growth & High-Ticket B2B Expansion",
+      "subtitle": "An annual strategic diagnostic evaluating school partnership accounts, corporate office recurring orders, game day pickup volumes, and delivery van logistics.",
+      "image_src": "teammembers.jpg",
+      "meta1_label": "Store Location",
+      "meta1_val": "Chick-fil-A Round Rock \u2022 Store #03241",
+      "meta2_label": "Reporting Period",
+      "meta2_val": "FY 2026 (Full Year Strategic)",
+      "meta3_label": "Sector Lead",
+      "meta3_val": "Elena Rostova, Director of Sales & Catering",
+      "meta4_label": "Review Date",
+      "meta4_val": "October 5, 2026"
+    },
+    "briefing": {
+      "tag": "Outside Sales Strategic Review",
+      "meta": "Presented to Executive Board & Operator",
+      "title": "FY2026 Outside Sales Trajectory & Corporate Account Strategy",
+      "goal": "Grow total catering volume to $620,000 (+28% YoY) and secure 25 recurring corporate weekly accounts.",
+      "why": "High-margin catering platters and bulk gallons deliver 42% higher gross margin than standard drive-thru tickets, but corporate re-order frequency dropped in Q2 due to unautomated follow-ups.",
+      "focus": "Automate proactive 72-hour re-order outreach to local corporate parks and implement dedicated catering staging in the FOH hallway."
+    },
+    "kpis": [
+      {
+        "name": "Annual Catering Revenue",
+        "actual": "$584,200",
+        "target": "$550,000",
+        "baseline": "$456,000",
+        "variance": "+$34.2K (+6.2%)",
+        "status": "ahead",
+        "status_label": "Ahead of Goal"
+      },
+      {
+        "name": "Active Corporate Accounts",
+        "actual": "22 Accounts",
+        "target": "25 Accounts",
+        "baseline": "14 Accounts",
+        "variance": "+8 Accounts (+57%)",
+        "status": "ontrack",
+        "status_label": "Strong Growth"
+      },
+      {
+        "name": "Average Catering Order Size",
+        "actual": "$248.50",
+        "target": "$225.00",
+        "baseline": "$212.00",
+        "variance": "+$23.50 (+10.4%)",
+        "status": "ahead",
+        "status_label": "High Ticket"
+      },
+      {
+        "name": "Bulk Beverage Attachment",
+        "actual": "64.2%",
+        "target": "75.0%",
+        "baseline": "58.0%",
+        "variance": "-10.8% Gap",
+        "status": "warning",
+        "status_label": "Opportunity"
+      },
+      {
+        "name": "On-Time Delivery Rate",
+        "actual": "99.1%",
+        "target": "98.5%",
+        "baseline": "96.2%",
+        "variance": "+0.6% Ahead",
+        "status": "ahead",
+        "status_label": "Exceptional"
+      }
+    ],
+    "pillars": {
+      "p1_title": "1. Annual Revenue Breakthroughs",
+      "p1_sub": "Where outsized catering growth occurred",
+      "p1_body": "Secured recurring Friday breakfast contracts with 3 local high school athletic departments and expanded medical office box meal lunch deliveries by +34%. On-time delivery accuracy improved to 99.1% with route clustering.",
+      "p2_title": "2. High-Value Margin Leakage",
+      "p2_sub": "Untapped potential and friction points",
+      "p2_bullets": [
+        "Missed Gallon & Dessert Attachment: 36% of large party tray orders departed without sweet tea gallons or cookie trays, leaving $45,000 in high-margin add-ons uncaptured.",
+        "Corporate Re-Order Decay: 18 corporate clients who ordered in Q1 did not place a follow-up order within 90 days due to lack of outbound contact.",
+        "Kitchen Staging Friction: During 11:30 AM lunch peak, catering tray assembly clashed with drive-thru bagger traffic near the prep table."
+      ],
+      "p3_title": "3. Strategic Scaling Priority",
+      "p3_sub": "The high-yield business lever for 2027",
+      "p3_body": "Establish a dedicated 'Catering Operations Zone' separate from the peak drive-thru line, and deploy an automated post-delivery loyalty follow-up call sequence for all orders over $200."
+    },
+    "matrix": [
+      {
+        "segment": "School & Athletic Programs",
+        "baseline": "$112,000",
+        "actual": "$148,500",
+        "target": "$135,000",
+        "variance": "+$13.5K (+10.0%)",
+        "notes": "Football and track concessions drove record Saturday volume; high loyalty."
+      },
+      {
+        "segment": "Corporate Lunches & Meetings",
+        "baseline": "$185,000",
+        "actual": "$224,200",
+        "target": "$210,000",
+        "variance": "+$14.2K (+6.8%)",
+        "notes": "Medical device and tech park offices ordered 40+ box meals consistently."
+      },
+      {
+        "segment": "Game Day & Weekend Tailgates",
+        "baseline": "$78,000",
+        "actual": "$98,400",
+        "target": "$95,000",
+        "variance": "+$3.4K (+3.6%)",
+        "notes": "Chilled reheat nugget trays performed exceptionally on college football Saturdays."
+      },
+      {
+        "segment": "Weddings & Social Events",
+        "baseline": "$42,000",
+        "actual": "$54,100",
+        "target": "$50,000",
+        "variance": "+$4.1K (+8.2%)",
+        "notes": "Mac & Cheese and waffle chip platters emerging as top social add-ons."
+      },
+      {
+        "segment": "Holiday Parties & Celebrations",
+        "baseline": "$39,000",
+        "actual": "$59,000",
+        "target": "$60,000",
+        "variance": "-$1.0K (-1.7%)",
+        "notes": "December tray orders hit kitchen capacity; needs early booking incentive."
+      }
+    ],
+    "tactics": [
+      {
+        "category": "1. Corporate Outbound Outreach",
+        "trigger": "Client order completes with zero activity in 60 days",
+        "action": "Catering Director conducts personal 5-minute phone check-in: 'Can we take lunch off your plate for your next quarterly department review?'",
+        "impact": "Reactivates 35% of dormant corporate accounts ($22K annual lift).",
+        "owner": "Elena Rostova (Catering Director)"
+      },
+      {
+        "category": "2. Beverage & Dessert Mandatory Prompt",
+        "trigger": "Guest orders nugget or strip platter without drinks/cookies",
+        "action": "Online order confirmation call script: 'Most office coordinators love pairing this with fresh-brewed Sweet Tea and warm cookies. Can I add those for you?'",
+        "impact": "Lifts bulk beverage attachment to 75% (+ $14K gross profit).",
+        "owner": "Chloe Bennett (Catering Coordinator)"
+      },
+      {
+        "category": "3. Dedicated Hallway Assembly Zone",
+        "trigger": "Kitchen lunch peak clashing with catering pickup times",
+        "action": "Relocate bulk packaging, condiments, tongs, and catering bags to the back hallway table 30 minutes before 11:30 AM rush.",
+        "impact": "Zero order collision between drive-thru baggers and catering packers.",
+        "owner": "Carlos Mendez (Kitchen Director)"
+      },
+      {
+        "category": "4. CFA One Catering Rewards Pitch",
+        "trigger": "Office managers placing catering orders over the phone",
+        "action": "Guide coordinator to link their corporate card to Chick-fil-A One app to earn free personal meals from corporate spending.",
+        "impact": "Locks in executive assistant loyalty against competitor catering options.",
+        "owner": "Marcus Vance (Director of Operations)"
+      }
+    ],
+    "closing_protocols": {
+      "reinforce": "\"Spectacular job on today's 65-platter corporate order! Delivered 10 minutes early with full condiments and pristine presentation. That's why clients stay with us for years!\"",
+      "correct": "\"Double-check all catering checklist tags before the van leaves: always count tongs, serving spoons, plates, and sauce squeezers twice. Details create the experience.\""
+    },
+    "cadence": [
+      {
+        "period": "Q1",
+        "focus": "B2B Medical & Corporate Prospecting",
+        "metric": "8 new recurring corporate office accounts",
+        "action": "Deliver complimentary mini-biscuit platters to top 15 office parks in 5-mile radius."
+      },
+      {
+        "period": "Q2",
+        "focus": "School & Sports League Contract Locking",
+        "metric": "Secure fall football concessions contracts",
+        "action": "Meet with high school booster clubs and athletic directors to finalize stadium menus."
+      },
+      {
+        "period": "Q3",
+        "focus": "Tailgate Campaign & Chilled Tray Push",
+        "metric": "+25% Weekend chilled reheat nugget tray sales",
+        "action": "Launch local social media giveaway and distribute bag-stuffer catering menus."
+      },
+      {
+        "period": "Q4",
+        "focus": "Holiday Corporate Booking Blitz",
+        "metric": "$65,000 December catering volume",
+        "action": "Send early-bird booking incentives (free cookie platter with $300+ order) by Nov 1."
+      }
+    ],
+    "guardrails": {
+      "dos": [
+        "Always include serving tongs, napkins, and labeled sauces with every tray.",
+        "Confirm all orders over $250 via phone call 24 hours in advance.",
+        "Pack hot items and cold salads in dedicated thermal catering bags.",
+        "Write a personalized, handwritten thank-you card on corporate orders."
+      ],
+      "donts": [
+        "Never accept a same-day custom catering order without kitchen leader approval.",
+        "Never load hot food directly next to iced sweet tea gallons in delivery vehicle.",
+        "Never deliver past the promised 15-minute delivery arrival window.",
+        "Never forget to replenish the catering packaging station at end-of-shift."
+      ]
+    },
+    "scorecard": [
+      {
+        "title": "1. Timely Prep & Verification",
+        "desc": "Order packed and staged 30 minutes before customer pickup/departure."
+      },
+      {
+        "title": "2. Complete Utensil Kit",
+        "desc": "Tongs, plates, napkins, and correct sauce varieties double-checked."
+      },
+      {
+        "title": "3. Perfect Temperature Control",
+        "desc": "Proteins held above 140\u00b0F in thermal transport carrier."
+      },
+      {
+        "title": "4. Professional Vehicle Handoff",
+        "desc": "Delivered with warm hospitality and set up cleanly for guest."
+      },
+      {
+        "title": "5. Post-Delivery Feedback Call",
+        "desc": "Follow-up touchpoint conducted within 48 hours to confirm satisfaction."
+      }
+    ],
+    "signoff": {
+      "sponsor": "Elena Rostova",
+      "sponsor_role": "Director of Sales & Catering",
+      "operator": "Dan Cathy / Operator Representative",
+      "operator_role": "Franchised Restaurant Operator",
+      "next_review": "January 15, 2027",
+      "milestone_status": "Annual Target Achieved \u2022 $620K Goal Set"
+    },
+    "footer": "Chick-fil-A Outside Sales & Catering \u2022 Annual Strategic Diagnostic \u2022 Round Rock, TX"
+  }
+};
+
+    let currentData = JSON.parse(JSON.stringify(PRESETS['sales']));
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem('cfa_sector_report_data');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed && parsed.header && parsed.kpis && parsed.kpis.length > 0) {
+            currentData = parsed;
+          }
+        } catch(e) {
+          console.warn("Could not load from localStorage", e);
+        }
+      }
+      populateForm();
+      renderPreview();
+    });
+
+    function persistData() {
+      localStorage.setItem('cfa_sector_report_data', JSON.stringify(currentData));
+    }
+
+    function toggleAccordion(header) {
+      const card = header.parentElement;
+      card.classList.toggle('closed');
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('formSidebar');
+      sidebar.classList.toggle('collapsed');
+      const isCollapsed = sidebar.classList.contains('collapsed');
+      document.getElementById('toggleIcon').textContent = isCollapsed ? '▶' : '◀';
+      document.getElementById('toggleText').textContent = isCollapsed ? 'Show Editor' : 'Hide Editor';
+    }
+
+    function loadSelectedPreset(presetKey) {
+      if (PRESETS[presetKey]) {
+        currentData = JSON.parse(JSON.stringify(PRESETS[presetKey]));
+        populateForm();
+        renderPreview();
+        persistData();
+      }
+    }
+
+    function updateField(path, value) {
+      const keys = path.split('.');
+      let target = currentData;
+      for (let i = 0; i < keys.length - 1; i++) {
+        target = target[keys[i]];
+      }
+      target[keys[keys.length - 1]] = value;
+      renderPreview();
+      persistData();
+    }
+
+    function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          currentData.header.image_src = evt.target.result;
+          document.getElementById('f_img_src').value = file.name;
+          renderPreview();
+          persistData();
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function updatePillarBullets(text) {
+      currentData.pillars.p2_bullets = text.split('\n').filter(line => line.trim().length > 0);
+      renderPreview();
+      persistData();
+    }
+
+    function updateGuardrails(type, text) {
+      currentData.guardrails[type] = text.split('\n').filter(line => line.trim().length > 0);
+      renderPreview();
+      persistData();
+    }
+
+    function populateForm() {
+      const d = currentData;
+      document.getElementById('f_cadence_tag').value = d.header.timeframe_type || '';
+      document.getElementById('f_sector_name').value = d.header.sector || '';
+      document.getElementById('f_title').value = d.header.title || '';
+      document.getElementById('f_subtitle').value = d.header.subtitle || '';
+      document.getElementById('f_img_src').value = d.header.image_src || '';
+      document.getElementById('f_m1_l').value = d.header.meta1_label || '';
+      document.getElementById('f_m1_v').value = d.header.meta1_val || '';
+      document.getElementById('f_m2_l').value = d.header.meta2_label || '';
+      document.getElementById('f_m2_v').value = d.header.meta2_val || '';
+      document.getElementById('f_m3_l').value = d.header.meta3_label || '';
+      document.getElementById('f_m3_v').value = d.header.meta3_val || '';
+      document.getElementById('f_m4_l').value = d.header.meta4_label || '';
+      document.getElementById('f_m4_v').value = d.header.meta4_val || '';
+
+      document.getElementById('f_b_tag').value = d.briefing.tag || '';
+      document.getElementById('f_b_meta').value = d.briefing.meta || '';
+      document.getElementById('f_b_title').value = d.briefing.title || '';
+      document.getElementById('f_b_goal').value = d.briefing.goal || '';
+      document.getElementById('f_b_why').value = d.briefing.why || '';
+      document.getElementById('f_b_focus').value = d.briefing.focus || '';
+
+      // Populate KPIs
+      const kpiContainer = document.getElementById('kpiFormContainer');
+      kpiContainer.innerHTML = '';
+      (d.kpis || []).forEach((kpi, idx) => {
+        const box = document.createElement('div');
+        box.style.border = '1px solid #E5E7EB';
+        box.style.borderRadius = '4px';
+        box.style.padding = '8px';
+        box.style.marginBottom = '8px';
+        box.style.background = '#F9FAFB';
+        box.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <span style="font-weight:700; font-size:0.72rem; color:#DD0031;">KPI Tile ${idx + 1}</span>
+            <button class="btn btn-secondary" style="padding:2px 6px; font-size:0.65rem;" onclick="removeKpiTile(${idx})" title="Delete KPI Tile">✕</button>
+          </div>
+          <div class="form-row-2" style="margin-bottom:6px;">
+            <input type="text" class="form-control" style="font-size:0.75rem;" placeholder="Metric Name" value="${escapeHtml(kpi.name)}" oninput="updateKpiField(${idx}, 'name', this.value)">
+            <input type="text" class="form-control" style="font-size:0.75rem; font-weight:700;" placeholder="Actual Value" value="${escapeHtml(kpi.actual)}" oninput="updateKpiField(${idx}, 'actual', this.value)">
+          </div>
+          <div class="form-row-3" style="margin-bottom:6px;">
+            <input type="text" class="form-control" style="font-size:0.72rem;" placeholder="Target" value="${escapeHtml(kpi.target)}" oninput="updateKpiField(${idx}, 'target', this.value)">
+            <input type="text" class="form-control" style="font-size:0.72rem;" placeholder="Baseline/Prior" value="${escapeHtml(kpi.baseline)}" oninput="updateKpiField(${idx}, 'baseline', this.value)">
+            <input type="text" class="form-control" style="font-size:0.72rem;" placeholder="Variance" value="${escapeHtml(kpi.variance)}" oninput="updateKpiField(${idx}, 'variance', this.value)">
+          </div>
+          <div class="form-row-2">
+            <select class="form-control" style="font-size:0.72rem;" onchange="updateKpiField(${idx}, 'status', this.value)">
+              <option value="ahead" ${kpi.status === 'ahead' ? 'selected' : ''}>Status: Ahead (Green)</option>
+              <option value="ontrack" ${kpi.status === 'ontrack' ? 'selected' : ''}>Status: On Track (Navy)</option>
+              <option value="warning" ${kpi.status === 'warning' ? 'selected' : ''}>Status: Gap / Warning (Red)</option>
+            </select>
+            <input type="text" class="form-control" style="font-size:0.72rem;" placeholder="Status Badge Text" value="${escapeHtml(kpi.status_label || '')}" oninput="updateKpiField(${idx}, 'status_label', this.value)">
+          </div>
+        `;
+        kpiContainer.appendChild(box);
+      });
+
+      document.getElementById('f_p1_title').value = d.pillars.p1_title || '';
+      document.getElementById('f_p1_sub').value = d.pillars.p1_sub || '';
+      document.getElementById('f_p1_body').value = d.pillars.p1_body || '';
+      document.getElementById('f_p2_title').value = d.pillars.p2_title || '';
+      document.getElementById('f_p2_sub').value = d.pillars.p2_sub || '';
+      document.getElementById('f_p2_bullets').value = (d.pillars.p2_bullets || []).join('\n');
+      document.getElementById('f_p3_title').value = d.pillars.p3_title || '';
+      document.getElementById('f_p3_sub').value = d.pillars.p3_sub || '';
+      document.getElementById('f_p3_body').value = d.pillars.p3_body || '';
+
+      // Populate Matrix
+      const mContainer = document.getElementById('matrixFormContainer');
+      mContainer.innerHTML = '';
+      (d.matrix || []).forEach((row, idx) => {
+        const mBox = document.createElement('div');
+        mBox.style.border = '1px solid #E5E7EB';
+        mBox.style.borderRadius = '4px';
+        mBox.style.padding = '8px';
+        mBox.style.marginBottom = '8px';
+        mBox.style.background = '#F9FAFB';
+        mBox.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <span style="font-weight:700; font-size:0.72rem; color:#DD0031;">Row ${idx + 1}</span>
+            <button class="btn btn-secondary" style="padding:2px 6px; font-size:0.65rem;" onclick="removeMatrixRow(${idx})" title="Delete Row">✕</button>
+          </div>
+          <div class="form-group" style="margin-bottom:6px;">
+            <input type="text" class="form-control" style="font-size:0.75rem; font-weight:700;" placeholder="Sub-Segment / Category" value="${escapeHtml(row.segment)}" oninput="updateMatrixField(${idx}, 'segment', this.value)">
+          </div>
+          <div class="form-row-3" style="margin-bottom:6px;">
+            <input type="text" class="form-control" style="font-size:0.72rem;" placeholder="Baseline" value="${escapeHtml(row.baseline)}" oninput="updateMatrixField(${idx}, 'baseline', this.value)">
+            <input type="text" class="form-control" style="font-size:0.72rem;" placeholder="Actual" value="${escapeHtml(row.actual)}" oninput="updateMatrixField(${idx}, 'actual', this.value)">
+            <input type="text" class="form-control" style="font-size:0.72rem;" placeholder="Target" value="${escapeHtml(row.target)}" oninput="updateMatrixField(${idx}, 'target', this.value)">
+          </div>
+          <div class="form-row-2">
+            <input type="text" class="form-control" style="font-size:0.72rem;" placeholder="Variance ($ or %)" value="${escapeHtml(row.variance)}" oninput="updateMatrixField(${idx}, 'variance', this.value)">
+            <input type="text" class="form-control" style="font-size:0.72rem;" placeholder="Operational Observation" value="${escapeHtml(row.notes)}" oninput="updateMatrixField(${idx}, 'notes', this.value)">
+          </div>
+        `;
+        mContainer.appendChild(mBox);
+      });
+
+      // Populate Tactics
+      const tContainer = document.getElementById('tacticsFormContainer');
+      tContainer.innerHTML = '';
+      (d.tactics || []).forEach((tactic, idx) => {
+        const tBox = document.createElement('div');
+        tBox.style.border = '1px solid #E5E7EB';
+        tBox.style.borderRadius = '4px';
+        tBox.style.padding = '8px';
+        tBox.style.marginBottom = '8px';
+        tBox.style.background = '#F9FAFB';
+        tBox.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <span style="font-weight:700; font-size:0.72rem; color:#DD0031;">Intervention ${idx + 1}</span>
+            <button class="btn btn-secondary" style="padding:2px 6px; font-size:0.65rem;" onclick="removeTacticCard(${idx})" title="Delete Card">✕</button>
+          </div>
+          <div class="form-group" style="margin-bottom:6px;">
+            <input type="text" class="form-control" style="font-size:0.75rem;" placeholder="Focus Category Pill" value="${escapeHtml(tactic.category)}" oninput="updateTacticField(${idx}, 'category', this.value)">
+          </div>
+          <div class="form-group" style="margin-bottom:6px;">
+            <input type="text" class="form-control" style="font-size:0.75rem;" placeholder="Identified Problem / Trigger" value="${escapeHtml(tactic.trigger)}" oninput="updateTacticField(${idx}, 'trigger', this.value)">
+          </div>
+          <div class="form-group" style="margin-bottom:6px;">
+            <textarea class="form-control" style="font-size:0.75rem; min-height:40px;" placeholder="Tactical Operational Action" oninput="updateTacticField(${idx}, 'action', this.value)">${escapeHtml(tactic.action)}</textarea>
+          </div>
+          <div class="form-row-2">
+            <input type="text" class="form-control" style="font-size:0.75rem;" placeholder="Target Impact" value="${escapeHtml(tactic.impact)}" oninput="updateTacticField(${idx}, 'impact', this.value)">
+            <input type="text" class="form-control" style="font-size:0.75rem;" placeholder="Accountable Owner" value="${escapeHtml(tactic.owner)}" oninput="updateTacticField(${idx}, 'owner', this.value)">
+          </div>
+        `;
+        tContainer.appendChild(tBox);
+      });
+
+      document.getElementById('f_proto_reinforce').value = d.closing_protocols?.reinforce || '';
+      document.getElementById('f_proto_correct').value = d.closing_protocols?.correct || '';
+
+      // Populate Cadence
+      const cContainer = document.getElementById('cadenceFormContainer');
+      cContainer.innerHTML = '';
+      (d.cadence || []).forEach((row, idx) => {
+        const rBox = document.createElement('div');
+        rBox.style.border = '1px solid #E5E7EB';
+        rBox.style.borderRadius = '4px';
+        rBox.style.padding = '8px';
+        rBox.style.marginBottom = '8px';
+        rBox.style.background = '#F9FAFB';
+        rBox.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <span style="font-weight:700; font-size:0.72rem; color:#DD0031;">Milestone ${idx + 1}</span>
+            <button class="btn btn-secondary" style="padding:2px 6px; font-size:0.65rem;" onclick="removeCadenceRow(${idx})" title="Delete Milestone">✕</button>
+          </div>
+          <div class="form-row-2" style="margin-bottom:6px;">
+            <input type="text" class="form-control" style="font-size:0.75rem;" placeholder="Week/Period" value="${escapeHtml(row.period)}" oninput="updateCadenceField(${idx}, 'period', this.value)">
+            <input type="text" class="form-control" style="font-size:0.75rem;" placeholder="Core Implementation Focus" value="${escapeHtml(row.focus)}" oninput="updateCadenceField(${idx}, 'focus', this.value)">
+          </div>
+          <div class="form-row-2">
+            <input type="text" class="form-control" style="font-size:0.75rem;" placeholder="Target Metric Checkpoint" value="${escapeHtml(row.metric)}" oninput="updateCadenceField(${idx}, 'metric', this.value)">
+            <input type="text" class="form-control" style="font-size:0.75rem;" placeholder="Leadership Verification Ritual" value="${escapeHtml(row.action)}" oninput="updateCadenceField(${idx}, 'action', this.value)">
+          </div>
+        `;
+        cContainer.appendChild(rBox);
+      });
+
+      document.getElementById('f_dos').value = (d.guardrails?.dos || []).join('\n');
+      document.getElementById('f_donts').value = (d.guardrails?.donts || []).join('\n');
+
+      // Populate Scorecard
+      const scContainer = document.getElementById('scorecardFormContainer');
+      scContainer.innerHTML = '';
+      (d.scorecard || []).forEach((item, idx) => {
+        const scBox = document.createElement('div');
+        scBox.style.marginBottom = '6px';
+        scBox.innerHTML = `
+          <div class="form-row-2">
+            <input type="text" class="form-control" style="font-size:0.75rem; font-weight:700;" placeholder="Title" value="${escapeHtml(item.title)}" oninput="updateScorecardField(${idx}, 'title', this.value)">
+            <input type="text" class="form-control" style="font-size:0.75rem;" placeholder="Description" value="${escapeHtml(item.desc)}" oninput="updateScorecardField(${idx}, 'desc', this.value)">
+          </div>
+        `;
+        scContainer.appendChild(scBox);
+      });
+
+      document.getElementById('f_so_sponsor').value = d.signoff?.sponsor || '';
+      document.getElementById('f_so_sp_role').value = d.signoff?.sponsor_role || '';
+      document.getElementById('f_so_operator').value = d.signoff?.operator || '';
+      document.getElementById('f_so_op_role').value = d.signoff?.operator_role || '';
+      document.getElementById('f_so_review').value = d.signoff?.next_review || '';
+      document.getElementById('f_so_status').value = d.signoff?.milestone_status || '';
+
+      document.getElementById('f_footer').value = d.footer || '';
+    }
+
+    function updateKpiField(idx, field, val) {
+      currentData.kpis[idx][field] = val;
+      renderPreview();
+      persistData();
+    }
+
+    function updateMatrixField(idx, field, val) {
+      currentData.matrix[idx][field] = val;
+      renderPreview();
+      persistData();
+    }
+
+    function updateTacticField(idx, field, val) {
+      currentData.tactics[idx][field] = val;
+      renderPreview();
+      persistData();
+    }
+
+    function updateCadenceField(idx, field, val) {
+      currentData.cadence[idx][field] = val;
+      renderPreview();
+      persistData();
+    }
+
+    function updateScorecardField(idx, field, val) {
+      currentData.scorecard[idx][field] = val;
+      renderPreview();
+      persistData();
+    }
+
+    
+    function addKpiTile() {
+      if (!currentData.kpis) currentData.kpis = [];
+      currentData.kpis.push({
+        name: "New Metric",
+        actual: "0.0",
+        target: "0.0",
+        baseline: "0.0",
+        variance: "0.0%",
+        status: "ontrack",
+        status_label: "Tracking"
+      });
+      populateForm();
+      renderPreview();
+      persistData();
+    }
+
+    function removeKpiTile(idx) {
+      if (currentData.kpis && currentData.kpis.length > 1) {
+        currentData.kpis.splice(idx, 1);
+        populateForm();
+        renderPreview();
+        persistData();
+      } else {
+        alert("You must keep at least 1 KPI tile.");
+      }
+    }
+
+    function addMatrixRow() {
+      if (!currentData.matrix) currentData.matrix = [];
+      currentData.matrix.push({
+        segment: "New Sub-Segment / Shift",
+        baseline: "$0",
+        actual: "$0",
+        target: "$0",
+        variance: "$0",
+        notes: "Enter key operational observations here."
+      });
+      populateForm();
+      renderPreview();
+      persistData();
+    }
+
+    function removeMatrixRow(idx) {
+      if (currentData.matrix && currentData.matrix.length > 1) {
+        currentData.matrix.splice(idx, 1);
+        populateForm();
+        renderPreview();
+        persistData();
+      } else {
+        alert("You must keep at least 1 matrix row.");
+      }
+    }
+
+    function addTacticCard() {
+      if (!currentData.tactics) currentData.tactics = [];
+      currentData.tactics.push({
+        category: "New Operational Area",
+        trigger: "Identified operational gap or root cause",
+        action: "Specific prescribed standard and protocol for team members",
+        impact: "Target measurable outcome and revenue/cost impact",
+        owner: "Shift Leader / Director"
+      });
+      populateForm();
+      renderPreview();
+      persistData();
+    }
+
+    function removeTacticCard(idx) {
+      if (currentData.tactics && currentData.tactics.length > 1) {
+        currentData.tactics.splice(idx, 1);
+        populateForm();
+        renderPreview();
+        persistData();
+      } else {
+        alert("You must keep at least 1 tactical card.");
+      }
+    }
+
+    function addCadenceRow() {
+      if (!currentData.cadence) currentData.cadence = [];
+      currentData.cadence.push({
+        period: "Milestone " + (currentData.cadence.length + 1),
+        focus: "Implementation priority and training roll-out",
+        metric: "Key metric checkpoint and target",
+        action: "Leadership observation ritual and audit"
+      });
+      populateForm();
+      renderPreview();
+      persistData();
+    }
+
+    function removeCadenceRow(idx) {
+      if (currentData.cadence && currentData.cadence.length > 1) {
+        currentData.cadence.splice(idx, 1);
+        populateForm();
+        renderPreview();
+        persistData();
+      } else {
+        alert("You must keep at least 1 cadence milestone.");
+      }
+    }
+
+    function setQuickCadence(cadenceType) {
+      if (cadenceType === 'monthly') {
+        currentData.header.timeframe_type = 'Monthly Sector Focus';
+      } else if (cadenceType === 'quarterly') {
+        currentData.header.timeframe_type = 'Quarterly Sector Review';
+      } else if (cadenceType === 'annual') {
+        currentData.header.timeframe_type = 'Annual Strategic Review';
+      }
+      populateForm();
+      renderPreview();
+      persistData();
+    }
+
+    function renderPreview() {
+      const d = currentData;
+
+      document.getElementById('p_hero_img').src = d.header.image_src || 'teammembers.jpg';
+      document.getElementById('p_cadence_tag').textContent = d.header.timeframe_type || 'Sector Focus';
+      document.getElementById('p_sector_name').textContent = d.header.sector || 'Business Diagnostic';
+      document.getElementById('p_title').textContent = d.header.title || '';
+      document.getElementById('p_subtitle').textContent = d.header.subtitle || '';
+
+      document.getElementById('p_m1_l').textContent = d.header.meta1_label || '';
+      document.getElementById('p_m1_v').textContent = d.header.meta1_val || '';
+      document.getElementById('p_m2_l').textContent = d.header.meta2_label || '';
+      document.getElementById('p_m2_v').textContent = d.header.meta2_val || '';
+      document.getElementById('p_m3_l').textContent = d.header.meta3_label || '';
+      document.getElementById('p_m3_v').textContent = d.header.meta3_val || '';
+      document.getElementById('p_m4_l').textContent = d.header.meta4_label || '';
+      document.getElementById('p_m4_v').textContent = d.header.meta4_val || '';
+
+      document.getElementById('p_b_tag').textContent = d.briefing.tag || 'Executive Briefing';
+      document.getElementById('p_b_title').textContent = d.briefing.title || '';
+      document.getElementById('p_b_meta').textContent = d.briefing.meta || '';
+      document.getElementById('p_b_goal').textContent = d.briefing.goal || '';
+      document.getElementById('p_b_why').textContent = d.briefing.why || '';
+      document.getElementById('p_b_focus').textContent = d.briefing.focus || '';
+
+      // Render KPI Tiles
+      const kpiGrid = document.getElementById('p_kpi_grid');
+      kpiGrid.innerHTML = '';
+      (d.kpis || []).forEach(kpi => {
+        const tile = document.createElement('div');
+        const st = kpi.status || 'ontrack';
+        tile.className = `kpi-tile ${st}`;
+        tile.innerHTML = `
+          <div>
+            <div class="kpi-tile-header">${escapeHtml(kpi.name)}</div>
+            <div class="kpi-tile-val">${escapeHtml(kpi.actual)}</div>
+            <div class="kpi-sub-row">Target: <strong>${escapeHtml(kpi.target)}</strong> • Base: ${escapeHtml(kpi.baseline)}</div>
+          </div>
+          <span class="kpi-variance-pill ${st}">${escapeHtml(kpi.variance)} • ${escapeHtml(kpi.status_label || st)}</span>
+        `;
+        kpiGrid.appendChild(tile);
+      });
+
+      document.getElementById('p_p1_title').textContent = d.pillars.p1_title || '';
+      document.getElementById('p_p1_sub').textContent = d.pillars.p1_sub || '';
+      document.getElementById('p_p1_body').textContent = d.pillars.p1_body || '';
+      document.getElementById('p_p2_title').textContent = d.pillars.p2_title || '';
+      document.getElementById('p_p2_sub').textContent = d.pillars.p2_sub || '';
+
+      const p2Ul = document.getElementById('p_p2_bullets');
+      p2Ul.innerHTML = '';
+      (d.pillars.p2_bullets || []).forEach(bullet => {
+        const li = document.createElement('li');
+        if (bullet.includes(':')) {
+          const parts = bullet.split(':');
+          li.innerHTML = `<strong>${escapeHtml(parts[0])}:</strong>${escapeHtml(parts.slice(1).join(':'))}`;
+        } else {
+          li.textContent = bullet;
+        }
+        p2Ul.appendChild(li);
+      });
+
+      document.getElementById('p_p3_title').textContent = d.pillars.p3_title || '';
+      document.getElementById('p_p3_sub').textContent = d.pillars.p3_sub || '';
+      document.getElementById('p_p3_body').textContent = d.pillars.p3_body || '';
+
+      // Render Matrix Table
+      const mTbody = document.getElementById('p_matrix_tbody');
+      mTbody.innerHTML = '';
+      (d.matrix || []).forEach(row => {
+        const tr = document.createElement('tr');
+        const isPos = (row.variance || '').includes('+');
+        const isNeg = (row.variance || '').includes('-');
+        let varClass = '';
+        if (isPos) varClass = 'pos';
+        else if (isNeg) varClass = 'neg';
+
+        tr.innerHTML = `
+          <td><span class="segment-badge">${escapeHtml(row.segment)}</span></td>
+          <td>${escapeHtml(row.baseline)}</td>
+          <td><strong>${escapeHtml(row.actual)}</strong></td>
+          <td>${escapeHtml(row.target)}</td>
+          <td><span class="matrix-var ${varClass}">${escapeHtml(row.variance)}</span></td>
+          <td>${escapeHtml(row.notes)}</td>
+        `;
+        mTbody.appendChild(tr);
+      });
+
+      // Render Tactics
+      const tacticsGrid = document.getElementById('p_tactics_grid');
+      tacticsGrid.innerHTML = '';
+      (d.tactics || []).forEach(tactic => {
+        const card = document.createElement('div');
+        card.className = 'tactic-card';
+        card.innerHTML = `
+          <div>
+            <div class="tactic-badge-row">
+              <span class="tactic-category">${escapeHtml(tactic.category)}</span>
+            </div>
+            <div class="trigger-text"><strong>Problem / Root Cause:</strong> ${escapeHtml(tactic.trigger)}</div>
+            <div class="action-bubble">"${escapeHtml(tactic.action.replace(/^"+|"+$/g, ''))}"</div>
+          </div>
+          <div class="tactic-footer-info">
+            <div><strong>Target Impact:</strong> ${escapeHtml(tactic.impact)}</div>
+            <div><strong>Accountable Lead:</strong> ${escapeHtml(tactic.owner)}</div>
+          </div>
+        `;
+        tacticsGrid.appendChild(card);
+      });
+
+      document.getElementById('p_proto_reinforce').textContent = d.closing_protocols?.reinforce || '';
+      document.getElementById('p_proto_correct').textContent = d.closing_protocols?.correct || '';
+
+      // Render Cadence Table
+      const cTbody = document.getElementById('p_cadence_tbody');
+      cTbody.innerHTML = '';
+      (d.cadence || []).forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><span class="week-badge">${escapeHtml(row.period)}</span></td>
+          <td><strong>${escapeHtml(row.focus)}</strong></td>
+          <td><strong>${escapeHtml(row.metric)}</strong></td>
+          <td>${escapeHtml(row.action)}</td>
+        `;
+        cTbody.appendChild(tr);
+      });
+
+      // Render Guardrails
+      const dosUl = document.getElementById('p_dos_list');
+      dosUl.innerHTML = '';
+      (d.guardrails?.dos || []).forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        dosUl.appendChild(li);
+      });
+
+      const dontsUl = document.getElementById('p_donts_list');
+      dontsUl.innerHTML = '';
+      (d.guardrails?.donts || []).forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        dontsUl.appendChild(li);
+      });
+
+      // Render Scorecard
+      const scGrid = document.getElementById('p_scorecard_grid');
+      scGrid.innerHTML = '';
+      (d.scorecard || []).forEach(item => {
+        const sBox = document.createElement('div');
+        sBox.className = 'scorecard-item';
+        sBox.innerHTML = `
+          <strong>${escapeHtml(item.title)}</strong>
+          <span>${escapeHtml(item.desc)}</span>
+        `;
+        scGrid.appendChild(sBox);
+      });
+
+      // Render Signoff
+      document.getElementById('p_so_sponsor').textContent = d.signoff?.sponsor || 'Marcus Vance';
+      document.getElementById('p_so_sp_role').textContent = d.signoff?.sponsor_role || 'Director of Operations';
+      document.getElementById('p_so_operator').textContent = d.signoff?.operator || 'Dan Cathy / Operator Representative';
+      document.getElementById('p_so_op_role').textContent = d.signoff?.operator_role || 'Franchised Restaurant Operator';
+      document.getElementById('p_so_review').textContent = d.signoff?.next_review || 'December 15, 2026';
+      document.getElementById('p_so_status').textContent = d.signoff?.milestone_status || 'Active Execution';
+
+      const footText = d.footer || 'Chick-fil-A Executive Operations • Sector Focus Diagnostic';
+      document.getElementById('p_footer_p1').textContent = footText;
+      document.getElementById('p_footer_p2').textContent = footText;
+      document.getElementById('p_footer_p3').textContent = footText;
+    }
+
+    function resetToDefault() {
+      const currentPresetKey = document.getElementById('presetSelector').value || 'sales';
+      if (confirm(`Reset all fields back to the clean '${currentPresetKey}' template? Any unsaved edits will be cleared.`)) {
+        localStorage.removeItem('cfa_sector_report_data');
+        currentData = JSON.parse(JSON.stringify(PRESETS[currentPresetKey] || PRESETS['sales']));
+        populateForm();
+        renderPreview();
+      }
+    }
+
+    function exportDataJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      const filename = (currentData.header.title || "cfa_sector_report").replace(/\s+/g, '_') + ".json";
+      downloadAnchor.setAttribute("download", filename);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importDataJSON(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const imported = JSON.parse(e.target.result);
+            if (imported && imported.header && imported.kpis) {
+              currentData = imported;
+              populateForm();
+              renderPreview();
+              persistData();
+              alert("Report template loaded successfully!");
+            } else {
+              alert("The imported file does not match the CFA Sector Report format.");
+            }
+          } catch(err) {
+            alert("Error parsing JSON file. Please make sure it is a valid CFA Report JSON.");
+          }
+        };
+        reader.readAsText(file);
+      }
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>
